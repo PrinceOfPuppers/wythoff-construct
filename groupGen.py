@@ -42,7 +42,6 @@ def generateRep(generators,prevRep,n):
     if n > 1000:
         raise Exception("Coset Generation Failed")
     
-    print(-n%len(generators))
     rep = np.matmul( generators[-n%len(generators)] , prevRep)
     #rep /= abs(np.linalg.det(rep))
     return rep
@@ -116,8 +115,6 @@ def findReflectionGroup(generators,groupOrder):
     i = 1
     while len(cosetReps)<numCosets:
 
-        print(i,len(cosetReps))
-
         if not areEqual(identity,np.eye(3)):
             raise Exception("identity mutated")
 
@@ -180,6 +177,16 @@ def hyperplaneIntersections(normals):
     #TODO check distances between intersections, if one is too far from the others take its negative
     return intersections
 
+def getSeedPoint(scalers,intersections):
+    """uses the intersections from hyperplaneIntersections as a basis to get a seed point in the primary
+    chamber of the kalidoscope, there should be one less scaler than there are intersections"""
+
+    point = intersections[0]
+    for i in range(0,len(scalers)):
+        point += scalers[i]*(intersections[i+1]-intersections[0])
+
+    return point
+
 def orbitPoint(point,group):
     """Finds the orbit of the point under reflection in all planes"""
     points=[]
@@ -187,43 +194,6 @@ def orbitPoint(point,group):
     for reflection in group:
         points.append(np.matmul(reflection,point))
     return points
-
-
-if __name__ == "__main__":
-    #tests group generation for reflection group [5,3] (icosahedral/dodecahedral/icosidodecahedral one)
-
-    normals = generatePlanes3D(np.pi/5,np.pi/3)
-    generators = [reflectionMatrix(normal) for normal in normals]
-
-    group = findReflectionGroup(generators,120)
-
-    counter=0
-    for i,element1 in enumerate(group):
-        for j,element2 in enumerate(group):
-            if i!=j and areEqual(element1,element2):
-                counter+=1
-
-    print("Duplicate elements: ",counter/2)
-
-
-
-    points = hyperplaneIntersections(normals)
-    for point in points:
-        print(point)
-
-    #scatterPlot(points)
-    icos = np.array([-5.81653359e-07, -1.27411629e-07,  1.00000000e+00])
-    icosidode = [ 1.68272143e-06, -5.25731221e-01,  8.50650741e-01]
-    dode = [ 0.35682216, -0.49112366,  0.7946547 ]
-
-    truncIcosiDode = [ (icos[i]+icosidode[i]+dode[i])/3 for i in range(3)]
-    orbit = orbitPoint(np.array(truncIcosiDode, dtype=np.float64),group)
-
-    print("points: ",len(orbit))
-    #scatterPlot(orbit)
-    removeDupes(orbit)
-    #wireframePlot(orbit)
-    sp(orbit)
 
     
 
