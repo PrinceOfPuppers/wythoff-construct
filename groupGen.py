@@ -3,7 +3,9 @@ import config as cfg
 from scipy.optimize import minimize
 
 
-from plotting import scatterPlot,wireframePlot,surfacePlot
+from mplPlotting import scatterPlot,wireframePlot,surfacePlot
+
+from mayAviPlotting import surfacePlot as sp
 from helpers import mulList,areEqual,isInList,removeDupes,reflectionMatrix,unitVecAngle
 
 
@@ -215,13 +217,13 @@ if __name__ == "__main__":
     dode = [ 0.35682216, -0.49112366,  0.7946547 ]
 
     truncIcosiDode = [ (icos[i]+icosidode[i]+dode[i])/3 for i in range(3)]
-    orbit = orbitPoint(np.array(icosidode, dtype=np.float64),group)
+    orbit = orbitPoint(np.array(truncIcosiDode, dtype=np.float64),group)
 
     print("points: ",len(orbit))
     #scatterPlot(orbit)
     removeDupes(orbit)
     #wireframePlot(orbit)
-    surfacePlot(orbit)
+    sp(orbit)
 
     
 

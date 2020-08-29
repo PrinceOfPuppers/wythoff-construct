@@ -14,11 +14,6 @@ def reflectInPlane(point,normal):
 
 
 
-
-
-
-    
-
 if __name__ == '__main__':
     import timeit
     norm = np.array((1,0,0))
