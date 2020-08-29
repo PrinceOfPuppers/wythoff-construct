@@ -9,8 +9,6 @@ from helpers import findFaces
 def getPolydata(pointList):
     faces = findFaces(pointList)
 
-    mlab.figure(fgcolor=(0, 0, 0), bgcolor=(1, 1, 1))
-
     scalars = []
     for face in faces:
         scalars.append(len(face))

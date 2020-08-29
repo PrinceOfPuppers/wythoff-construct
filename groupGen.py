@@ -181,9 +181,10 @@ def getSeedPoint(scalers,intersections):
     """uses the intersections from hyperplaneIntersections as a basis to get a seed point in the primary
     chamber of the kalidoscope, there should be one less scaler than there are intersections"""
 
-    point = intersections[0]
+    point = intersections[0].copy()
     for i in range(0,len(scalers)):
-        point += scalers[i]*(intersections[i+1]-intersections[0])
+       
+        point += scalers[i]*( np.subtract(intersections[i+1],intersections[0]))
 
     return point
 
