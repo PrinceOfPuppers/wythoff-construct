@@ -16,6 +16,10 @@ class SliderList(HasTraits):
     sliders = List(comparison_mode=1)
     #used for iterating
     index = 0
+    def __init__(self,num,low,high,val):
+        HasTraits.__init__(self)
+        for _ in range(num):
+            self.addSlider(low,high,val)
 
     def __len__(self):
         return len(self.sliders)
@@ -77,13 +81,17 @@ class DropDown(HasTraits):
         
 
 class UI(HasTraits):
+    opacity = Range(0.,1.,1.)
     seedSliders=Instance(SliderList)
     kalidoscope = Instance(DropDown)
     scene = Instance(MlabSceneModel, ())
     view = View(Group(
                 Group(Item('scene', editor=SceneEditor(scene_class=MayaviScene),springy=True),
                 Item('seedSliders',editor = InstanceEditor(),style='custom',),show_labels=False,),
-                Group(Item('kalidoscope',editor=InstanceEditor(),style='custom')),
+                HGroup(
+                    Item('kalidoscope',editor=InstanceEditor(),style='custom'),
+                    Item('opacity',editor=RangeEditor())
+                    ),
                 ),
                 resizable = True,
     )
@@ -91,23 +99,23 @@ class UI(HasTraits):
     def __init__(self):
         HasTraits.__init__(self)
         self.interactive=False
-        
-        self.seedSliders = SliderList()
-        self.seedSliders.addSlider(0.0,1.0, 0.25)
-        self.seedSliders.addSlider(0.0,1.0, 0.25)
-
         self.dim = 3
+
+        self.seedSliders = SliderList(self.dim-1, 0.0, 1.0, 1/(self.dim-1)**2)
+
+
         kals = cfg.coxeterLookup(self.dim)
         kal = kals["[3,5]"]
 
         self.kalidoscope=DropDown(kals.keys())
-        #self.s = mlab.surf(x, y, np.asarray(x*1.5, 'd'), figure=self.scene.mayavi_scene)
 
 
         orbit = self.initalizeKalidoscope(kal)
         self.polydata = getPolydata(orbit)
 
-        mlab.pipeline.surface(self.polydata,opacity = 1,figure=self.scene.mayavi_scene)
+
+        self.surfaceActor = mlab.pipeline.surface(self.polydata,opacity = 1,figure=self.scene.mayavi_scene).actor
+
         mlab.pipeline.surface(self.polydata,opacity = 1,representation='wireframe',color=(0,0,0),figure=self.scene.mayavi_scene)
 
         self.interactive = True
@@ -128,7 +136,6 @@ class UI(HasTraits):
         orbit = orbitPoint(seed,self.group)
 
         return orbit
-
 
     @observe("seedSliders:sliders:items")
     def seedSliders_changed(self,event):
@@ -153,9 +160,9 @@ class UI(HasTraits):
     @observe("kalidoscope:enum")
     def kalidoscope_changed(self,event):
         self.interactive = False
-        #saves slider values to return them after generation
-        #we need to generate the shape in a configuration where all
-        #polygons are visable (so we can connect them properly)
+        # saves slider values to return them after generation
+        # we need to generate the shape in a configuration where all
+        # polygons are visable (so we can connect them properly)
         sliderVals = []
 
         for i,sliderVal in enumerate(self.seedSliders):
@@ -181,10 +188,15 @@ class UI(HasTraits):
         seed=getSeedPoint(iter(self.seedSliders),self.intersections)
         orbit = orbitPoint(seed,self.group)
         self.polydata.points = orbit
-        
+
         self.interactive=True
+    
+    @observe("opacity")
+    def opacity_changed(self,event):
+        self.surfaceActor.property.opacity=event.new
+    
 
-
+    
 if __name__ == "__main__":
     ui = UI()
 

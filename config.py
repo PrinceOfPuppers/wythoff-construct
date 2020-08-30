@@ -2,6 +2,7 @@ from numpy import pi
 from math import factorial
 
 epsilon = 10e-3
+
 exponents=["⁰", "¹","²", "³", "⁴", "⁵", "⁶","⁷",  "⁸", "⁹"]
 def expStr(num):
     exp=""
