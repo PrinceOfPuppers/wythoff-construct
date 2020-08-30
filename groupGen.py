@@ -9,12 +9,13 @@ from helpers import mulList,areEqual,isInList,removeDupes,reflectionMatrix,unitV
 def generatePlanes3D(angle1, angle2):
     """generates list of plane normals, given successive dihedral angles between planes.
     first and last are orthogonal, dimension is 3"""
-
+    
     #test if valid planes using spherical excess formula 
     if angle1%(2*np.pi) < cfg.epsilon or angle2%(2*np.pi) < cfg.epsilon:
         raise Exception("Planes Cannot be Colinear")
 
-    if 1/angle1+1/angle2+2/np.pi < np.pi:
+    if angle1 + angle2 + np.pi <= np.pi:
+
         raise Exception("Invalid plane Configuration")
 
     
@@ -29,6 +30,9 @@ def generatePlanes3D(angle1, angle2):
 
     print(f"Plane Angles: π/{np.pi/unitVecAngle(normal1,normal2)}, π/{np.pi/unitVecAngle(normal2,normal3)}, π/{np.pi/unitVecAngle(normal3,normal1)}")
 
+    print("Normals")
+    for normal in (normal1,normal2,normal3):
+        print(tuple([round(x,3) for x in normal]))
     return normal1,normal2,normal3
 
 
@@ -81,7 +85,6 @@ def findReflectionGroup(generators,groupOrder):
     while True:
         subgroupElement = np.matmul(subGen2,subgroupElement)
         if areEqual(identity,subgroupElement):
-            print(subgroupElement)
             break
             
         subgroup.append(subgroupElement)
@@ -89,7 +92,6 @@ def findReflectionGroup(generators,groupOrder):
     
         subgroupElement = np.matmul(subGen1,subgroupElement)
         if areEqual(identity,subgroupElement):
-            print(subgroupElement)
             break
         subgroup.append(subgroupElement)
 
@@ -166,10 +168,20 @@ def hyperplaneIntersections(normals):
             coeffs = np.array( (n1,n2), dtype=np.float64 )
             linearSystem = lambda x: np.absolute(np.dot( coeffs, x )).max()
             constraints = ( {'type': 'eq', 'fun': lambda x: np.linalg.norm(x)-1} )
-
-            intersection = minimize( linearSystem, np.zeros(len(n1)), method='SLSQP', constraints=constraints, options={'disp': False})
+            guess = np.zeros(len(n1))
+            guess[-1]=1
+            intersection = minimize( linearSystem, guess, method='SLSQP', constraints=constraints, options={'disp': False})
             intersections.append(intersection.x)
     
+
+
+    #for intersection in intersections:
+    #    print(tuple([round(x,3) for x in intersection]))
+    #for i,intersection in enumerate(intersections[1:]):
+#
+    #    if np.dot(intersection,intersections[0])>np.pi/2:
+    #        print("flippin")
+    #        intersections[i]*=-1
     #TODO check distances between intersections, if one is too far from the others take its negative
     return intersections
 

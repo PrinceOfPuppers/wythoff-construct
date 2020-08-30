@@ -5,6 +5,8 @@ from traits.api import HasTraits, Range, Instance,List,observe
 from traitsui.api import View, Item, Group,RangeEditor,InstanceEditor,ListEditor
 from mayavi.core.ui.api import MayaviScene, SceneEditor, MlabSceneModel
 
+import config as cfg
+
 from groupGen import generatePlanes3D, orbitPoint,hyperplaneIntersections,findReflectionGroup,getSeedPoint
 from helpers import reflectionMatrix
 
@@ -82,11 +84,16 @@ class UI(HasTraits):
 
         #self.s = mlab.surf(x, y, np.asarray(x*1.5, 'd'), figure=self.scene.mayavi_scene)
 
-        normals = generatePlanes3D(np.pi/5,np.pi/3)
+        kalidoscopes = cfg.coxeterLookup(3)
+        
+        kal = kalidoscopes[2]
+
+        #normals = generatePlanes3D(np.pi/5,np.pi/3)
+        normals = generatePlanes3D(kal.planeAngles[0],kal.planeAngles[1])
         generators = [reflectionMatrix(normal) for normal in normals]
 
-        self.group = findReflectionGroup(generators,120)
-
+        #self.group = findReflectionGroup(generators,120)
+        self.group = findReflectionGroup(generators,kal.order)
         self.intersections = hyperplaneIntersections(normals)
 
 
