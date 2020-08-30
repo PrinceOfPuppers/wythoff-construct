@@ -1,73 +1,83 @@
 import numpy as np
 from mayavi import mlab
 
-from traits.api import HasTraits, Range, Instance,on_trait_change,List,observe
+from traits.api import HasTraits, Range, Instance,List,observe
 from traitsui.api import View, Item, Group,RangeEditor,InstanceEditor,ListEditor
 from mayavi.core.ui.api import MayaviScene, SceneEditor, MlabSceneModel
 
 from groupGen import generatePlanes3D, orbitPoint,hyperplaneIntersections,findReflectionGroup,getSeedPoint
-from helpers import reflectionMatrix,areEqual
+from helpers import reflectionMatrix
 
 from mayAviPlotting import getPolydata
 
 
 class SliderList(HasTraits):
-    sliders = List()
-    
+    sliders = List(comparison_mode=1)
+    #used for iterating
+    index = 0
+
     def __len__(self):
         return len(self.sliders)
 
-    def getVal(self,i):
+    def __next__(self):
+        if self.index<len(self):
+            val = self[self.index]
+            self.index+=1
+            return val
+        else:
+            self.index = 0
+            raise StopIteration
+
+    def __iter__(self):
+        return self
+
+    def __getitem__(self,i):
         element = self.sliders[i]
         if type(element)==float:
             return element
         return element.value
-            
-    def getVals(self):
-        return [self.getVal(i) for i in range(len(self))]
-    
+
+    def __setitem__(self,i,val):
+        self.sliders[i] = val
+
     def getSum(self):
         n = 0
         for i in range(len(self)):
-            n+=self.getVal(i)
+            n+=self[i]
         return n
 
     def addSlider(self,low,high,val):
         self.sliders.append(Range(low,high))
         self.sliders[-1] = val
 
-    def setSlider(self,i,val):
-        self.sliders[i] = val
-
-    def moveSlider(self,i,delta):
-        self.sliders[i] = delta + self.getVal(i)
 
     traits_view = View(Group(Item('sliders',
                                 style='custom',
-                                editor=ListEditor(editor=RangeEditor())),
+                                editor=ListEditor(editor=RangeEditor())
+                                ),
                             orientation='vertical',
                             scrollable=True,
                             show_labels=False),
                             #resizable = True,
-
                             )
 
-class MyModel(HasTraits):
-    sliders=Instance(SliderList)
+class UI(HasTraits):
+    seedSliders=Instance(SliderList)
     scene = Instance(MlabSceneModel, ())
     view = View(Group(Item('scene', editor=SceneEditor(scene_class=MayaviScene),springy=True),
-                Item('sliders',editor = InstanceEditor(),style='custom',),
+                Item('seedSliders',editor = InstanceEditor(),style='custom',),
                 show_labels=False,),
-                
                 resizable = True
                 )
 
 
     def __init__(self):
         HasTraits.__init__(self)
-        self.sliders = SliderList()
-        self.sliders.addSlider(0.0,1.0, 0.25)
-        self.sliders.addSlider(0.0,1.0, 0.25)
+        self.interactive=False
+
+        self.seedSliders = SliderList()
+        self.seedSliders.addSlider(0.0,1.0, 0.25)
+        self.seedSliders.addSlider(0.0,1.0, 0.25)
 
 
         #self.s = mlab.surf(x, y, np.asarray(x*1.5, 'd'), figure=self.scene.mayavi_scene)
@@ -80,7 +90,7 @@ class MyModel(HasTraits):
         self.intersections = hyperplaneIntersections(normals)
 
 
-        seed=getSeedPoint(self.sliders.getVals(),self.intersections)
+        seed=getSeedPoint(iter(self.seedSliders),self.intersections)
 
 
         orbit = orbitPoint(seed,self.group)
@@ -91,17 +101,32 @@ class MyModel(HasTraits):
 
         mlab.pipeline.surface(self.polydata,opacity = 1,figure=self.scene.mayavi_scene)
         mlab.pipeline.surface(self.polydata,opacity = 1,representation='wireframe',color=(0,0,0),figure=self.scene.mayavi_scene)
+
+        self.interactive = True
         
         
-    @observe("sliders:sliders:items")
-    def slider_changed(self,event):
-        seed=getSeedPoint(self.sliders.getVals(),self.intersections)
+    @observe("seedSliders:sliders:items")
+    def seedSliders_changed(self,event):
+        #interactive flag keeps slider from being recursivly updated due to mutation in this method
+        if self.interactive:
+            self.interactive = False
+            sliderSum = self.seedSliders.getSum()
+            if  sliderSum > 1:
 
-        orbit = orbitPoint(seed,self.group)
+                for i in range(len(self.seedSliders)):
+                    if i!=event.index:
+                        self.seedSliders[i]=round(self.seedSliders[i]-(sliderSum-1.0)/(len(self.seedSliders)-1.0),4)
 
-        self.polydata.points = orbit
+            seed=getSeedPoint(iter(self.seedSliders),self.intersections)
 
-my_model = MyModel()
+            orbit = orbitPoint(seed,self.group)
 
-#mlab.show()
-my_model.configure_traits()
+            self.polydata.points = orbit
+
+            self.interactive = True
+
+
+if __name__ == "__main__":
+    ui = UI()
+
+    ui.configure_traits()

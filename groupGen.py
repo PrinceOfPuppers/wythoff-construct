@@ -2,10 +2,6 @@ import numpy as np
 import config as cfg
 from scipy.optimize import minimize
 
-
-from mplPlotting import scatterPlot,wireframePlot,surfacePlot
-
-from mayAviPlotting import surfacePlot as sp
 from helpers import mulList,areEqual,isInList,removeDupes,reflectionMatrix,unitVecAngle
 
 
@@ -182,9 +178,9 @@ def getSeedPoint(scalers,intersections):
     chamber of the kalidoscope, there should be one less scaler than there are intersections"""
 
     point = intersections[0].copy()
-    for i in range(0,len(scalers)):
+    for i,scaler in enumerate(scalers):
        
-        point += scalers[i]*( np.subtract(intersections[i+1],intersections[0]))
+        point += scaler*( np.subtract(intersections[i+1],intersections[0]))
 
     return point
 
