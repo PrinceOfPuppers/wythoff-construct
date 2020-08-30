@@ -2,71 +2,110 @@ import numpy as np
 import config as cfg
 from scipy.optimize import minimize
 
-from helpers import mulList,areEqual,isInList,removeDupes,reflectionMatrix,unitVecAngle
+from helpers import mulList,areEqual,isInList,reflectionMatrix,unitVecAngle,findFaces,mapArrayList
+from functools import reduce
 
 
 
-def generatePlanes3D(angle1, angle2):
+
+
+#def generatePlanes(angleList):
+#    angle1=angleList[0]
+#    angle2=angleList[1]
+#    """generates list of plane normals, given successive dihedral angles between planes.
+#    first and last are orthogonal, dimension is 3"""
+#    
+#    #test if valid planes using spherical excess formula 
+#    if angle1%(2*np.pi) < cfg.epsilon or angle2%(2*np.pi) < cfg.epsilon:
+#        raise Exception("Planes Cannot be Colinear")
+#
+#    if angle1 + angle2 + np.pi <= np.pi:
+#
+#        raise Exception("Invalid plane Configuration")
+#
+#    
+#    #normal1 is e_1, normal2 is rotated in direction of e_2 by specified angle
+#    #normal3 is in y,z plane (orthogonal to normal1) and is at angle2 away from normal2
+#    normal1 = np.array((1,0,0), dtype=np.float64)
+#    normal2 = np.array( (np.cos(angle1), np.sin(angle1), 0), dtype=np.float64 ) 
+#
+#    a = np.cos(angle2)/np.sin(angle1)
+#
+#    normal3 = np.array( (0, a, np.sqrt(1-a*a)),dtype=np.float64 ) 
+#
+#    print(f"Plane Angles: π/{np.pi/unitVecAngle(normal1,normal2)}, π/{np.pi/unitVecAngle(normal2,normal3)}, π/{np.pi/unitVecAngle(normal3,normal1)}")
+#
+#    print("Normals")
+#    for normal in (normal1,normal2,normal3):
+#        print(tuple([round(x,3) for x in normal]))
+#    return normal1,normal2,normal3
+
+def generatePlanes(angleList):
     """generates list of plane normals, given successive dihedral angles between planes.
-    first and last are orthogonal, dimension is 3"""
-    
-    #test if valid planes using spherical excess formula 
-    if angle1%(2*np.pi) < cfg.epsilon or angle2%(2*np.pi) < cfg.epsilon:
-        raise Exception("Planes Cannot be Colinear")
+    first and last are orthogonal, works in any dimension"""
+    dim = len(angleList)+1
 
-    if angle1 + angle2 + np.pi <= np.pi:
-
-        raise Exception("Invalid plane Configuration")
-
-    
     #normal1 is e_1, normal2 is rotated in direction of e_2 by specified angle
     #normal3 is in y,z plane (orthogonal to normal1) and is at angle2 away from normal2
-    normal1 = np.array((1,0,0), dtype=np.float64)
-    normal2 = np.array( (np.cos(angle1), np.sin(angle1), 0), dtype=np.float64 ) 
+    normal1 = np.zeros(dim, dtype=np.float64)
+    normal1[0] = 1.
+    normals=[normal1]
+    
+    for i in range(1,dim):
+        n = np.zeros(dim)
+        a = np.cos(angleList[i-1])/normals[-1][i-1]
+        n[i-1] = a
+        n[i] = np.sqrt(1-a**2)
+        normals.append(n)
 
-    a = np.cos(angle2)/np.sin(angle1)
+    message = "Plane Angles: "
+    for i in range(dim-1):
+        message+= f"π/{np.pi/unitVecAngle(normals[i],normals[i+1])}, "
+    print(message)
 
-    normal3 = np.array( (0, a, np.sqrt(1-a*a)),dtype=np.float64 ) 
-
-    print(f"Plane Angles: π/{np.pi/unitVecAngle(normal1,normal2)}, π/{np.pi/unitVecAngle(normal2,normal3)}, π/{np.pi/unitVecAngle(normal3,normal1)}")
+    message = "normal lengths: "
+    for i in range(dim):
+        message+= f"{np.dot(normals[i],normals[i])}, "
+    print(message)
 
     print("Normals")
-    for normal in (normal1,normal2,normal3):
+    for normal in normals:
         print(tuple([round(x,3) for x in normal]))
-    return normal1,normal2,normal3
+
+
+    return normals
+
+#def generateRep(generators,prevRep,n):
+#    """makes coset representitive using generators and a number
+#    should go on random walk though entire reflection space"""
+#    if n > 10000:
+#        raise Exception("Coset Generation Failed")
+#    
+#    rep = np.matmul( generators[-n%len(generators)] , prevRep)
+#    #rep /= abs(np.linalg.det(rep))
+#    return rep
 
 
 def generateRep(generators,prevRep,n):
-    """makes coset representitive using generators and a number
-    should go on random walk though entire reflection space"""
-    if n > 1000:
-        raise Exception("Coset Generation Failed")
+    """counting algorithm for generating group elements using the least possible number of products"""
+    # this counts up like regular numbers except the digits are the generators
+    numGens = len(generators)
+
+    base = 1
+
+    rep = prevRep
+    indices=[]
+    while base<=n:
+        index = (n//base)%numGens
+        
+        indices.append(index)
+        gen = generators[index]
+        rep = np.matmul(gen,rep)
+        
+        base*=numGens
     
-    rep = np.matmul( generators[-n%len(generators)] , prevRep)
-    #rep /= abs(np.linalg.det(rep))
+    #print(indices)
     return rep
-
-
-#def generateRep(generators,identity,n):
-#    """counting algorithm for generating group elements using the least possible number of products"""
-#    # this counts up like regular numbers except the digits are the generators
-#    numGens = len(generators)
-#
-#    base = 1
-#
-#    rep = identity
-#    indices=[]
-#    while base<=n:
-#        index = (n//base)%numGens
-#        
-#        indices.append(index)
-#        gen = generators[index]
-#        rep = np.matmul(gen,rep)
-#        
-#        base*=numGens
-#    
-#    print(indices)
-#    return rep
 
 
 def findReflectionGroup(generators,groupOrder):
@@ -76,7 +115,9 @@ def findReflectionGroup(generators,groupOrder):
     #generating subgroup
     subGen1 = generators[0]
     subGen2 = generators[1] #note subGen2 isnt in the subgroup, subGen2*subGen1 is, along with further products
-    identity = np.identity(subGen1.shape[0])
+
+    dim = subGen1.shape[0]
+    identity = np.identity(dim)
 
     subgroup = [ identity, subGen1 ]
 
@@ -110,10 +151,11 @@ def findReflectionGroup(generators,groupOrder):
     
     prevRep=identity.copy()
 
-    i = 1
-    while len(cosetReps)<numCosets:
+    i = 0
 
-        if not areEqual(identity,np.eye(3)):
+    while len(cosetReps)<numCosets:
+        i+=1
+        if not areEqual(identity,np.eye(dim)):
             raise Exception("identity mutated")
 
         rep = generateRep(generators,prevRep,i)
@@ -128,9 +170,10 @@ def findReflectionGroup(generators,groupOrder):
                 isNewRep=False
                 break
         if isNewRep:
+            #i=0
             cosetReps.append(rep)
+            #print(f"{100*len(cosetReps)/numCosets}%")
         
-        i+=1
 
     #at this point we have enough cosets to generate the entire group
     group = []
@@ -160,18 +203,24 @@ def findReflectionGroup(generators,groupOrder):
         
 
 
-#finds hyperplane intersections that are on the unit hypersphere
+
 def hyperplaneIntersections(normals):
+    """Finds vertices of the simplex that makes the primary chamber of the kalidoscope
+    that is to say it finds points which lay on the n-sphere and are also on all but one
+    of the hyperplanes
+    
+    takes in normals of hyperplanes and returns vertices of simplex"""
+
     intersections = []
-    for i,n1 in enumerate(normals):
-        for n2 in normals[i+1:]:
-            coeffs = np.array( (n1,n2), dtype=np.float64 )
-            linearSystem = lambda x: np.absolute(np.dot( coeffs, x )).max()
-            constraints = ( {'type': 'eq', 'fun': lambda x: np.linalg.norm(x)-1} )
-            guess = np.zeros(len(n1))
-            guess[-1]=1
-            intersection = minimize( linearSystem, guess, method='SLSQP', constraints=constraints, options={'disp': False})
-            intersections.append(intersection.x)
+    dim = len(normals[0])
+    for i in range(dim):
+        coeffs = np.array( [normals[j] for j in range(dim) if j!=i], dtype=np.float64 )
+        linearSystem = lambda x: np.absolute(np.dot( coeffs, x )).max()
+        constraints = ( {'type': 'eq', 'fun': lambda x: np.linalg.norm(x)-1} )
+        guess = np.zeros(dim)
+        guess[-1]=1
+        intersection = minimize( linearSystem, guess, method='SLSQP', constraints=constraints, options={'disp': False})
+        intersections.append(intersection.x)
     
 
 
@@ -197,12 +246,35 @@ def getSeedPoint(scalers,intersections):
     return point
 
 def orbitPoint(point,group):
-    """Finds the orbit of the point under reflection in all planes"""
+    """Finds the orbit of the point under reflection in all planes and returns orbit"""
     points=[]
-    
+
     for reflection in group:
         points.append(np.matmul(reflection,point))
+
     return points
+
+def getPointsAndFaces(point, group, projection = None):
+    """wrapper for orbitPoints, find faces and project orbit onto 3 dimensions (useful due to order sensitivity)"""
+
+    orbit = orbitPoint(point, group)
+    print("orbited")
+    faces = findFaces(orbit)
+    print("got faces")
+
+    if type(projection)!= type(None):
+        mapArrayList(projection,orbit)
+    
+    return orbit,faces
+
+def getPoints(point,group,projection=None):
+    orbit=orbitPoint(point,group)
+    if type(projection)!= type(None):
+        mapArrayList(projection,orbit)
+
+    return orbit
+
+
 
     
 

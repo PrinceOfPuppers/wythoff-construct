@@ -7,10 +7,13 @@ from mayavi.core.ui.api import MayaviScene, SceneEditor, MlabSceneModel
 
 import config as cfg
 
-from groupGen import generatePlanes3D, orbitPoint,hyperplaneIntersections,findReflectionGroup,getSeedPoint
-from helpers import reflectionMatrix
+from groupGen import generatePlanes,hyperplaneIntersections,findReflectionGroup,getSeedPoint,getPoints,getPointsAndFaces
+from helpers import reflectionMatrix,mapArrayList
 
 from mayAviPlotting import getPolydata
+from datetime import datetime, timezone, timedelta
+def getMili():
+    return (datetime.now(timezone.utc) + timedelta(days=3)).timestamp() * 1e3
 
 class SliderList(HasTraits):
     sliders = List(comparison_mode=1)
@@ -78,6 +81,10 @@ class DropDown(HasTraits):
     def __setitem__(self,i,entry):
         self.entries[i] = entry
 
+    def __getitem__(self,i):
+        self.enum = self.entries[i]
+        return self.entries[i]
+
         
 
 class UI(HasTraits):
@@ -100,103 +107,124 @@ class UI(HasTraits):
         HasTraits.__init__(self)
         self.interactive=False
         self.dim = 3
-
+        
+        #self.projection = np.array([(1,1,-1,-1),(-1,1,-1,1),(1,-1,-1,1)])
+        self.projection = None
         self.seedSliders = SliderList(self.dim-1, 0.0, 1.0, 1/(self.dim-1)**2)
 
 
         kals = cfg.coxeterLookup(self.dim)
-        kal = kals["[3,5]"]
+
 
         self.kalidoscope=DropDown(kals.keys())
+        kal = kals[self.kalidoscope[0]]
 
+        seed = self.initalizeKalidoscope(kal)
 
-        orbit = self.initalizeKalidoscope(kal)
-        self.polydata = getPolydata(orbit)
+        vertices,faces = getPointsAndFaces(seed,self.group,self.projection)
+        self.polydata = getPolydata(vertices,faces)
 
-
-        self.surfaceActor = mlab.pipeline.surface(self.polydata,opacity = 1,figure=self.scene.mayavi_scene).actor
-
-        mlab.pipeline.surface(self.polydata,opacity = 1,representation='wireframe',color=(0,0,0),figure=self.scene.mayavi_scene)
+        self.surfaceActor = mlab.pipeline.surface(self.polydata, name="faces", opacity = 1,figure=self.scene.mayavi_scene).actor
+        mlab.pipeline.surface(self.polydata, name="wireframe", opacity = 1,representation='wireframe',color=(0,0,0),figure=self.scene.mayavi_scene)
 
         self.interactive = True
         
     def initalizeKalidoscope(self,kal):
-        #normals = generatePlanes3D(np.pi/5,np.pi/3)
-        normals = generatePlanes3D(kal.planeAngles[0],kal.planeAngles[1])
+        normals = generatePlanes(kal.planeAngles)
         generators = [reflectionMatrix(normal) for normal in normals]
 
-        #self.group = findReflectionGroup(generators,120)
         self.group = findReflectionGroup(generators,kal.order)
         self.intersections = hyperplaneIntersections(normals)
-
-
         seed=getSeedPoint(iter(self.seedSliders),self.intersections)
 
-
-        orbit = orbitPoint(seed,self.group)
-
-        return orbit
+        return seed
 
     @observe("seedSliders:sliders:items")
     def seedSliders_changed(self,event):
         #interactive flag keeps slider from being recursivly updated due to mutation in this method
+
         if self.interactive:
             self.interactive = False
+
+            #drops other sliders if sum is greater than 1
             sliderSum = self.seedSliders.getSum()
             if  sliderSum > 1:
 
+                nonZeroSliders = len(self.seedSliders)
+                for slider in self.seedSliders:
+                    if slider<=0:
+                        nonZeroSliders-=1
+                    
                 for i in range(len(self.seedSliders)):
-                    if i!=event.index:
-                        self.seedSliders[i]=round(self.seedSliders[i]-(sliderSum-1.0)/(len(self.seedSliders)-1.0),4)
+                    if i!=event.index and self.seedSliders[i]>0:
 
+                        self.seedSliders[i]=round(self.seedSliders[i]-(sliderSum-1.0)/(nonZeroSliders-1.0),4)
+
+
+            #updates points
             seed=getSeedPoint(iter(self.seedSliders),self.intersections)
+            vertices = getPoints(seed,self.group,self.projection)
+            
+            self.polydata.points=vertices
 
-            orbit = orbitPoint(seed,self.group)
+            #clamps sliders to between 0 and 1
+            for i in range(len(self.seedSliders)):
+                if self.seedSliders[i]>1.:
+                    self.seedSliders[i]=1.
 
-            self.polydata.points = orbit
+                elif self.seedSliders[i]<0.:
+                    self.seedSliders[i]=0.
 
             self.interactive = True
 
     @observe("kalidoscope:enum")
     def kalidoscope_changed(self,event):
-        self.interactive = False
-        # saves slider values to return them after generation
-        # we need to generate the shape in a configuration where all
-        # polygons are visable (so we can connect them properly)
-        sliderVals = []
+        if self.interactive:
+            self.interactive = False
+            # saves slider values to return them after generation
+            # we need to generate the shape in a configuration where all
+            # polygons are visable (so we can connect them properly)
+            sliderVals = []
 
-        for i,sliderVal in enumerate(self.seedSliders):
-            sliderVals.append(sliderVal)
-            self.seedSliders[i]=(1/(self.dim))**2
+            for i,sliderVal in enumerate(self.seedSliders):
+                sliderVals.append(sliderVal)
+                self.seedSliders[i]=(1/(self.dim))**2
 
 
-        kal = cfg.coxeterLookup(self.dim)[event.new]
+            kal = cfg.coxeterLookup(self.dim)[event.new]
+            t = getMili()
+            seed = self.initalizeKalidoscope(kal)
 
-        orbit = self.initalizeKalidoscope(kal)
+            vertices,faces = getPointsAndFaces(seed,self.group,self.projection)
 
-        newPolydata = getPolydata(orbit)
-        self.polydata.polys = newPolydata.polys
+            newPolydata = getPolydata(vertices,faces)
 
-        self.polydata.cell_data.scalars=newPolydata.cell_data.scalars
-        self.polydata.cell_data.scalars.name = "celldata" 
+            self.polydata.polys = newPolydata.polys
 
-        # we now generate the shape with the proper vertex configuration (with the
-        # sliders in the configuartion they where before)
-        for i in range(len(self.seedSliders)):
-            self.seedSliders[i]=sliderVals[i]
-        
-        seed=getSeedPoint(iter(self.seedSliders),self.intersections)
-        orbit = orbitPoint(seed,self.group)
-        self.polydata.points = orbit
+            self.polydata.cell_data.scalars=newPolydata.cell_data.scalars
+            self.polydata.cell_data.scalars.name = "celldata" 
 
-        self.interactive=True
+            print("gentime: ",getMili()-t, " miliseconds")
+            # we now generate the shape with the proper vertex configuration (with the
+            # sliders in the configuartion they where before)
+            for i in range(len(self.seedSliders)):
+                self.seedSliders[i]=sliderVals[i]
+
+            seed=getSeedPoint(iter(self.seedSliders),self.intersections)
+            vertices = getPoints(seed,self.group,self.projection)
+
+
+            self.polydata.points = vertices
+
+            self.interactive=True
     
     @observe("opacity")
     def opacity_changed(self,event):
-        self.surfaceActor.property.opacity=event.new
+        #exponenet is to make the slider have a more linear feel
+        self.surfaceActor.property.opacity= event.new**3
     
 
-    
+
 if __name__ == "__main__":
     ui = UI()
 

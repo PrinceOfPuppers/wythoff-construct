@@ -19,7 +19,7 @@ class Kalidoscope:
 # special familes of kalidoscopes
 
 I_h = Kalidoscope(120,[pi/5,pi/3],"[3,5]")
-H_4 = Kalidoscope(14400,[pi/5,3,3],f"[3^{expStr(2)},5]") #H_4 symmetry group
+H_4 = Kalidoscope(14400,[pi/5,pi/3,pi/3],f"[3{expStr(2)},5]") #H_4 symmetry group
 
 # 2 Infinite familys of kalidoscopes
 def getFamily(dim,familyNum):
@@ -28,7 +28,7 @@ def getFamily(dim,familyNum):
     #simplex
     if familyNum==0:
         order = factorial((dim+1)) # order of S_n+1
-        for _ in range(dim):
+        for _ in range(dim-1):
             planeAngles.append(pi/3)
 
         label = f"[3{expStr(dim-1)}]"
@@ -38,13 +38,13 @@ def getFamily(dim,familyNum):
         order = (2**dim)*factorial(dim)
 
         planeAngles.append(pi/4)
-        for _ in range(dim-1):
+        for _ in range(dim-2):
             planeAngles.append(pi/3)
 
         if dim==3:
             subString = "3"
         else:
-            subString =f"{expStr(dim-2)}"
+            subString =f"3{expStr(dim-2)}"
 
         label = f"[{subString},4]"
     return Kalidoscope(order,planeAngles,label)

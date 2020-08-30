@@ -4,12 +4,15 @@ import config as cfg
 from scipy.spatial import ConvexHull
 from scipy.linalg import null_space
 
+def mapArrayList(arr,arrList):
+    for i,a in enumerate(arrList):
+        arrList[i] = np.matmul(arr,a)
+
 def mulList(arrList):
     result = arrList[0].copy()
     for arr in arrList[1:]:
         result = np.matmul(result,arr)
     return result
-
 
 def areEqual(arr1, arr2):
 
@@ -22,13 +25,10 @@ def isInList(arr,arrList):
             return True
     return False
 
-def removeDupes(arrList):
-    i=0
-    while i<len(arrList):
-        if isInList(arrList[i],arrList[i+1:]):
-            arrList.pop(i)
-        else:
-            i+=1
+def removeDupes(arr):
+    """removes duplicate rows"""
+    return np.unique(arr.round(5),axis=0)
+
 
 def reflectionMatrix(normal):
     return np.identity(len(normal), dtype=np.float64) - 2*np.outer(normal,normal)
@@ -46,6 +46,7 @@ def findFaces(pointList):
     returns indices of face vertices"""
 
     hull = ConvexHull(pointList)
+    #print("got hull")
     faces = []
     if pointList[0].size == 2:
         face = [hull.simplices[0][0],hull.simplices[0][1]]
@@ -63,9 +64,8 @@ def findFaces(pointList):
                     faces.append(face)
                     return faces
     
-
-    eqs = [eq for eq in hull.equations]
-    removeDupes(eqs)
+    eqs = removeDupes(hull.equations)
+    
     #iterates through all hyperplanes
     for eq in eqs:
         normal = np.array((eq[:-1]))
@@ -79,7 +79,7 @@ def findFaces(pointList):
 
         pointsInPlane = []
         indices = []
-
+        #print("hello")
         for i,point in enumerate(pointList):
             dist = abs(np.dot(point,normal) + const)/np.linalg.norm(normal)
 
@@ -160,3 +160,4 @@ def findEdges(pointList):
         i+=1
     
     return edges
+

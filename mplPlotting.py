@@ -3,7 +3,7 @@ from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 from matplotlib.collections import PolyCollection
 import matplotlib.pyplot as plt
 
-from helpers import findEdges,findFaces,removeDupes
+from helpers import findEdges,findFaces
 import numpy as np
 
 def axisEqual3D(ax):
