@@ -2,8 +2,12 @@ from numpy import pi
 from math import factorial
 
 epsilon = 10e-3
-
-
+exponents=["⁰", "¹","²", "³", "⁴", "⁵", "⁶","⁷",  "⁸", "⁹"]
+def expStr(num):
+    exp=""
+    for char in str(num):
+        exp+=exponents[int(char)]
+    return exp
 
 class Kalidoscope:
     def __init__(self, order, planeAngles, label):
@@ -14,7 +18,7 @@ class Kalidoscope:
 # special familes of kalidoscopes
 
 I_h = Kalidoscope(120,[pi/5,pi/3],"[3,5]")
-H_4 = Kalidoscope(14400,[pi/5,3,3],"[$3^2$,5]") #H_4 symmetry group
+H_4 = Kalidoscope(14400,[pi/5,3,3],f"[3^{expStr(2)},5]") #H_4 symmetry group
 
 # 2 Infinite familys of kalidoscopes
 def getFamily(dim,familyNum):
@@ -26,7 +30,8 @@ def getFamily(dim,familyNum):
         for _ in range(dim):
             planeAngles.append(pi/3)
 
-        label = f"[$3^{dim-1}$]"
+        label = f"[3{expStr(dim-1)}]"
+
     #hypercube and cross polytope
     else:
         order = (2**dim)*factorial(dim)
@@ -38,7 +43,7 @@ def getFamily(dim,familyNum):
         if dim==3:
             subString = "3"
         else:
-            subString =f"$3^{dim-2}$"
+            subString =f"{expStr(dim-2)}"
 
         label = f"[{subString},4]"
     return Kalidoscope(order,planeAngles,label)
@@ -49,8 +54,12 @@ def coxeterLookup(dim):
     k2 = getFamily(dim,1)
 
     if dim == 3:
-        return (k1,k2,I_h)
+        kals = (k1,k2,I_h)
+
     elif dim == 4:
-        return (k1,k2,H_4)
+        kals= (k1,k2,H_4)
+
+    else:
+        kals = (k1,k2)
         
-    return (k1,k2)
+    return {kal.label:kal for kal in kals}
