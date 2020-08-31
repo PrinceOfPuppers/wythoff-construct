@@ -4,6 +4,8 @@ import config as cfg
 from scipy.spatial import ConvexHull
 from scipy.linalg import null_space
 
+
+
 def mapArrayList(arr,arrList):
     for i,a in enumerate(arrList):
         arrList[i] = np.matmul(arr,a)
@@ -29,19 +31,35 @@ def removeDupes(arr):
     """removes duplicate rows"""
     return np.unique(arr.round(5),axis=0)
 
+def embed(big,small,x,y):
+
+    bigx,bigy = big.shape 
+    smallx,smally = small.shape
+
+    for a in range(smallx):
+        for b in range(smally):
+
+            big[(a+x)%bigx][(b+y)%bigy] = small[a][b]
+
 
 def rotationMatrix(dim,ax,theta):
-    """returns a rotation matrix around the axis number ax by theta radians in dimension dim.
-    ie) dim=3 ax=0 theta=pi/2 returns a rotation about the x axis by 90 degrees"""
+    c = np.cos(theta)
+    s = np.sin(theta)
+    if dim == 2:
+        return np.array(((c,-s),(s,c)))
 
-    rot = np.zeros((dim,dim))
+    dimOrder = 3**(dim-2)
+    ax%=dimOrder
+    subDimOrder = 3**(dim-3)
+    subax = ax%subDimOrder
 
-    rot[0][0] = np.cos(theta)
-    rot[0][ax+1] = ((-1)**(ax+1))*np.sin(theta)
-    rot[ax+1][0] = ((-1)**(ax))*np.sin(theta)
-    rot[ax][ax] = np.cos(theta)
+    rotMatrix = rotationMatrix(dim-1,subax,theta)
+    ax = ax// subDimOrder
 
-    return rot
+    eye = np.eye(dim)
+    embed(eye,rotMatrix,ax,ax)
+
+    return eye
 
 
 def reflectionMatrix(normal):
@@ -200,3 +218,34 @@ def getProjection(scalars):
 
     return projection
 
+
+def orthographicProjection(points,dim):
+    if dim>3:
+        basis = np.zeros((dim,3))
+        basis[0][0] = basis[1][1] = basis[2][2] =1
+        return np.matmul(points,basis)
+    return points
+
+def perspectiveProjection(points,dim):
+    if dim == 3:
+        return points
+
+    projectedPoints = np.empty((len(points),dim-1))
+    planePos = np.zeros(dim)
+    planePos[0] = 3
+
+    planeBasis = np.eye(dim)[1:]
+
+    lightPos = np.zeros(dim)
+    lightPos[0] = 1.8
+    
+    for i,point in enumerate(points):
+        v = point - lightPos
+
+
+        cat = np.vstack((planeBasis,-v))
+
+        sol =  np.linalg.solve(cat.T,lightPos-planePos)
+        projectedPoints[i] =sol[:len(planeBasis)]
+
+    return perspectiveProjection(projectedPoints,dim-1)

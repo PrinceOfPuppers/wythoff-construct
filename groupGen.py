@@ -2,7 +2,7 @@ import numpy as np
 import config as cfg
 from scipy.optimize import minimize
 
-from helpers import mulList,areEqual,isInList,reflectionMatrix,unitVecAngle,findFaces,mapArrayList
+from helpers import mulList,areEqual,isInList,reflectionMatrix,unitVecAngle,findFaces,orthographicProjection,rotationMatrix,perspectiveProjection
 from functools import reduce
 
 
@@ -246,6 +246,9 @@ def getSeedPoint(scalers,intersections):
 
     return point
 
+
+
+
 def orbitPoint(point,group):
     """Finds the orbit of the point under reflection in all planes and returns orbit"""
     points=np.empty((len(group),len(group[0])))
@@ -255,7 +258,7 @@ def orbitPoint(point,group):
 
     return points
 
-def getPointsAndFaces(point, group, projection = None):
+def getPointsAndFaces(point, group, projection, scalars = None):
     """wrapper for orbitPoints, find faces and project orbit onto 3 dimensions (useful due to order sensitivity)"""
 
     orbit = orbitPoint(point, group)
@@ -263,14 +266,27 @@ def getPointsAndFaces(point, group, projection = None):
     faces = findFaces(orbit)
     print("got faces")
 
-    if type(projection)!= type(None):
-        orbit = np.matmul(orbit,projection.T)
+    dim = len(orbit[0])
+    if scalars!= None:
+        rot = np.eye(dim)
+        for i,scalar in enumerate(scalars):
+            np.matmul(rotationMatrix(dim,i,scalar),rot,rot)
 
+        np.matmul(orbit,rot,orbit)
+    orbit = projection(orbit,len(orbit[0]))
     return orbit,faces
 
-def getPoints(point,group,projection=None):
+def getPoints(point,group, projection,scalars=None):
     orbit=orbitPoint(point,group)
-    if type(projection)!= type(None):
-        orbit = np.matmul(orbit,projection.T)
-
+    dim = len(orbit[0])
+    if scalars!= None:
+        rot = np.eye(dim)
+        for i,scalar in enumerate(scalars):
+            np.matmul(rotationMatrix(dim,i,scalar),rot,rot)
+    
+        np.matmul(orbit,rot,orbit)
+    orbit = projection(orbit,len(orbit[0]))
+    #if type(projection)!= type(None):
+    #    orbit = np.matmul(orbit,projection.T)
+#
     return orbit
