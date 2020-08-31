@@ -2,6 +2,7 @@ from numpy import pi
 from math import factorial
 
 epsilon = 10e-3
+enableH_4 = False # too many edges to look nice with projection
 
 exponents=["⁰", "¹","²", "³", "⁴", "⁵", "⁶","⁷",  "⁸", "⁹"]
 def expStr(num):
@@ -19,7 +20,7 @@ class Kalidoscope:
 # special familes of kalidoscopes
 
 I_h = Kalidoscope(120,[pi/5,pi/3],"[3,5]")
-H_4 = Kalidoscope(14400,[pi/5,pi/3,pi/3],f"[3{expStr(2)},5]") #H_4 symmetry group
+H_4 = Kalidoscope(14400,[pi/5,pi/3,pi/3],f"[3{expStr(2)},5]") 
 
 # 2 Infinite familys of kalidoscopes
 def getFamily(dim,familyNum):
@@ -58,9 +59,12 @@ def coxeterLookup(dim):
         kals = (k1,k2,I_h)
 
     elif dim == 4:
-        kals= (k1,k2,H_4)
+        if enableH_4: #H_4 symmetry group is so large it looks like a black ball
+            kals= (k1,k2,H_4)
+        else:
+            kals=(k1,k2)
 
     else:
-        kals = (k1,k2)
+        kals = [k1] # B_5 crashes convexhull so only A_5 is avalible
         
     return {kal.label:kal for kal in kals}

@@ -161,3 +161,27 @@ def findEdges(pointList):
     
     return edges
 
+def getProjection(scalars):
+    """generates a projection matrix (orthonormal basis vectors for dim 3 subspace) given a set of scalars
+    dim is assumed to be number of scalars + 1, method used is by generating normal of subspace and finding
+    its nullspace"""
+
+    dim = len(scalars)+1
+    if dim <4:
+        return None
+    #generates vector on hyper sphere given by angles in scalars
+    sines=1
+    normal = np.zeros(dim)
+    normal[0] = 1
+    for i in range(1,dim):
+        normal[i-1]*=np.cos(scalars[i-1])
+
+        sines*=np.sin(scalars[i-1])
+
+        normal[i]=sines
+
+    zeroVec = np.zeros(dim)
+    projection = null_space( np.array( (normal, zeroVec) )).T[:3]
+
+
+    return projection
