@@ -30,6 +30,20 @@ def removeDupes(arr):
     return np.unique(arr.round(5),axis=0)
 
 
+def rotationMatrix(dim,ax,theta):
+    """returns a rotation matrix around the axis number ax by theta radians in dimension dim.
+    ie) dim=3 ax=0 theta=pi/2 returns a rotation about the x axis by 90 degrees"""
+
+    rot = np.zeros((dim,dim))
+
+    rot[0][0] = np.cos(theta)
+    rot[0][ax+1] = ((-1)**(ax+1))*np.sin(theta)
+    rot[ax+1][0] = ((-1)**(ax))*np.sin(theta)
+    rot[ax][ax] = np.cos(theta)
+
+    return rot
+
+
 def reflectionMatrix(normal):
     return np.identity(len(normal), dtype=np.float64) - 2*np.outer(normal,normal)
 
@@ -45,7 +59,7 @@ def findFaces(pointList):
     """takes in polytope vertices and finds all flat convex 2d faces
     returns indices of face vertices"""
 
-    hull = ConvexHull(pointList)
+    hull = ConvexHull(pointList,qhull_options="C-0")
     #print("got hull")
     faces = []
     if pointList[0].size == 2:
@@ -185,3 +199,4 @@ def getProjection(scalars):
 
 
     return projection
+

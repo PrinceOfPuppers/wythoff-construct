@@ -218,7 +218,8 @@ def hyperplaneIntersections(normals):
         linearSystem = lambda x: np.absolute(np.dot( coeffs, x )).max()
         constraints = ( {'type': 'eq', 'fun': lambda x: np.linalg.norm(x)-1} )
         guess = np.zeros(dim)
-        guess[-1]=1
+        guess[-1] = 1
+        guess[-2] = 0.1
         intersection = minimize( linearSystem, guess, method='SLSQP', constraints=constraints, options={'disp': False})
         intersections.append(intersection.x)
     
@@ -247,10 +248,10 @@ def getSeedPoint(scalers,intersections):
 
 def orbitPoint(point,group):
     """Finds the orbit of the point under reflection in all planes and returns orbit"""
-    points=[]
+    points=np.empty((len(group),len(group[0])))
 
-    for reflection in group:
-        points.append(np.matmul(reflection,point))
+    for i,reflection in enumerate(group):
+        np.matmul(reflection,point,points[i])
 
     return points
 
@@ -263,18 +264,13 @@ def getPointsAndFaces(point, group, projection = None):
     print("got faces")
 
     if type(projection)!= type(None):
-        mapArrayList(projection,orbit)
-    
+        orbit = np.matmul(orbit,projection.T)
+
     return orbit,faces
 
 def getPoints(point,group,projection=None):
     orbit=orbitPoint(point,group)
     if type(projection)!= type(None):
-        mapArrayList(projection,orbit)
+        orbit = np.matmul(orbit,projection.T)
 
     return orbit
-
-
-
-    
-

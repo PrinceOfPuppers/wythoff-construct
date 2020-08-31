@@ -20,7 +20,10 @@ class Kalidoscope:
 # special familes of kalidoscopes
 
 I_h = Kalidoscope(120,[pi/5,pi/3],"[3,5]")
+
 H_4 = Kalidoscope(14400,[pi/5,pi/3,pi/3],f"[3{expStr(2)},5]") 
+
+D_5h = Kalidoscope(4*5,[pi/5,pi/2],"[5,2]") 
 
 # 2 Infinite familys of kalidoscopes
 def getFamily(dim,familyNum):
@@ -55,8 +58,9 @@ def coxeterLookup(dim):
     k1 = getFamily(dim,0)
     k2 = getFamily(dim,1)
 
+
     if dim == 3:
-        kals = (k1,k2,I_h)
+        kals = [k1,k2,I_h,D_5h]
 
     elif dim == 4:
         if enableH_4: #H_4 symmetry group is so large it looks like a black ball
