@@ -26,7 +26,7 @@ class UI(HasTraits):
     seedSliders=Instance(SliderList)
     rotationSliders = Instance(SliderList)
     kalidoscope = Instance(DropDown)
-    scene = Instance(MlabSceneModel, ())
+    scene = MlabSceneModel()
 
     projTypeValues = ("perspective","orthographic")
     projectionType = Enum(values = "projTypeValues")

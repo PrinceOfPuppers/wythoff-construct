@@ -222,17 +222,7 @@ def hyperplaneIntersections(normals):
         guess[-2] = 0.1
         intersection = minimize( linearSystem, guess, method='SLSQP', constraints=constraints, options={'disp': False})
         intersections.append(intersection.x)
-    
 
-
-    #for intersection in intersections:
-    #    print(tuple([round(x,3) for x in intersection]))
-    #for i,intersection in enumerate(intersections[1:]):
-#
-    #    if np.dot(intersection,intersections[0])>np.pi/2:
-    #        print("flippin")
-    #        intersections[i]*=-1
-    #TODO check distances between intersections, if one is too far from the others take its negative
     return intersections
 
 def getSeedPoint(scalers,intersections):
@@ -245,8 +235,6 @@ def getSeedPoint(scalers,intersections):
         point += scaler*( np.subtract(intersections[i+1],intersections[0]))
 
     return point
-
-
 
 
 def orbitPoint(point,group):
