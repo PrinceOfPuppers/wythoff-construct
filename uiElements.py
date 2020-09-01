@@ -1,21 +1,28 @@
 
-from traits.api import HasTraits, Range, List, Enum, Float
-from traitsui.api import View, Item, Group, ListEditor
+from traits.api import HasTraits, Range, List, Enum, Int
+from traitsui.api import View, Item, Group, ListEditor,RangeEditor,DefaultOverride
+
 
 
 class SliderList(HasTraits):
 
     #used for iterating
     index = 0
-    low = Float(0.)
-    high = Float(1.)
+    low = 0.
+    high = 1.
+    
+    listedit= ListEditor(columns = 3)
+    sliders = List( 
+                    Range(low="low",high="high",editor = RangeEditor(low_label = "​", high_label = "​") ), 
+                    editor = listedit,
+                    comparison_mode=1, 
+                    cols= 3
+                    )
 
-    sliders = List(Range(low='low',high='high'),comparison_mode=1)
-    def __init__(self,num,low,high,val):
+    def __init__(self,numEntries,val,numColumns = 1):
         HasTraits.__init__(self)
-        self.low = low
-        self.high = high
-        for _ in range(num):
+        for _ in range(numEntries):
+            self.listedit.columns = numColumns
             self.addSlider(val)
 
     def __len__(self):
@@ -55,19 +62,23 @@ class SliderList(HasTraits):
     def removeSlider(self):
         self.sliders.pop()
 
-    traits_view = View(Group(Item('sliders',
-                                #style='custom',
-                                editor=ListEditor()
-                                ),
-                            #orientation='vertical',
-                            #scrollable=True,
-                            show_labels=False),
-                            #resizable = True,
-                            )
+    view = View(Group(
+                Item('sliders',
+                       #style='custom',
+
+                       style='readonly'
+                       ),
+                    orientation='vertical',
+                    scrollable=True,
+                    
+                    show_labels=False
+                    ),
+                resizable = True,
+                )
 
 class DropDown(HasTraits):
     entries=()
-    enum = Enum(values='entries')
+    enum = Enum(values='entries',cols=5)
     traits_view = View(Group(Item('enum',style='custom'),orientation='vertical',show_labels=False))
 
     def __init__(self,entries):

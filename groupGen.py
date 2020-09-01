@@ -195,7 +195,7 @@ def getPointsAndFaces(point, group, projection, scalars = None):
     if scalars!= None:
         rot = np.eye(dim)
         for i,scalar in enumerate(scalars):
-            np.matmul(rotationMatrix(dim,i,scalar),rot,rot)
+            np.matmul(rotationMatrix(dim,i,2*np.pi*scalar),rot,rot)
 
         np.matmul(orbit,rot,orbit)
     orbit = projection(orbit,len(orbit[0]))
@@ -207,7 +207,7 @@ def getPoints(point,group, projection,scalars=None):
     if scalars!= None:
         rot = np.eye(dim)
         for i,scalar in enumerate(scalars):
-            np.matmul(rotationMatrix(dim,i,scalar),rot,rot)
+            np.matmul(rotationMatrix(dim,i,2*np.pi*scalar),rot,rot)
     
         np.matmul(orbit,rot,orbit)
     orbit = projection(orbit,len(orbit[0]))

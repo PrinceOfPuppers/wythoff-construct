@@ -52,7 +52,7 @@ class UI(HasTraits):
                     ),
                 HGroup(
                     Item('projectionType',style = "simple"),
-                    Item('opacity',editor=RangeEditor()),
+                    Item('opacity',editor=RangeEditor(low_label = "​", high_label = "​")),
                     )
                 ),
                 resizable = True,
@@ -62,13 +62,13 @@ class UI(HasTraits):
         HasTraits.__init__(self)
         self.interactive=False
         
-        self.seedSliders = SliderList(self.dimension-1, 0.0, 1.0, 1/(self.dimension-1)**2)
+        self.seedSliders = SliderList(self.dimension-1,1/(self.dimension-1)**2)
         self.perspectiveEnum = "projection"
         self.projection = perspectiveProjection
         if self.dimension>3:
-            self.rotationStr="Rotation:"
+            self.rotationStr="Rotation (multiple of 2π): "
 
-            self.rotationSliders = SliderList(3**(self.dimension-2) - 3,0.0,round(2*np.pi,4),0.0)
+            self.rotationSliders = SliderList(3**(self.dimension-2) - 3,0.0,self.dimension-2)
         else:
             self.rotationSliders = None
 
@@ -135,7 +135,7 @@ class UI(HasTraits):
             dim = event.new
 
             #add and adjust seed sliders
-            self.seedSliders = SliderList(dim-1, 0.0, 1.0, 1/(dim-1)**2)
+            self.seedSliders = SliderList(dim-1,1/(dim-1)**2)
 
             #add and adjust rotation sliders
             if dim>3:
@@ -143,8 +143,8 @@ class UI(HasTraits):
                 if 1 - self.opacity <cfg.epsilon:
                     self.opacity = 0.4
 
-                self.rotationStr="Rotation: "
-                self.rotationSliders = SliderList(3**(dim-2) - 3,0.0,round(2*np.pi,4),0.0)
+                self.rotationStr="Rotation (multiple of 2π): "
+                self.rotationSliders = SliderList(3**(dim-2) - 3,0.0,dim - 2)
                 
             else:
                 self.rotationStr=""
@@ -178,19 +178,14 @@ class UI(HasTraits):
                     
                 for i in range(len(self.seedSliders)):
                     if i!=event.index and self.seedSliders[i]>0:
+                        val = self.seedSliders[i]-(sliderSum-1.0)/(nonZeroSliders-1.0)
 
-                        self.seedSliders[i]=self.seedSliders[i]-(sliderSum-1.0)/(nonZeroSliders-1.0)
+                        val = max(0,min(1,val)) #clamps value to between 0,1
+
+                        self.seedSliders[i] = val
 
 
             self.updatePoints()
-
-            #clamps sliders to between 0 and 1
-            for i in range(len(self.seedSliders)):
-                if self.seedSliders[i]>1.:
-                    self.seedSliders[i]=1.
-
-                elif self.seedSliders[i]<0.:
-                    self.seedSliders[i]=0.
 
             self.interactive = True
 
