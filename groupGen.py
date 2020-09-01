@@ -2,51 +2,14 @@ import numpy as np
 import config as cfg
 from scipy.optimize import minimize
 
-from helpers import mulList,areEqual,isInList,reflectionMatrix,unitVecAngle,findFaces,orthographicProjection,rotationMatrix,perspectiveProjection
+from helpers import areEqual,isInList,reflectionMatrix,unitVecAngle,findFaces,orthographicProjection,rotationMatrix,perspectiveProjection
 from functools import reduce
-
-
-
-
-
-#def generatePlanes(angleList):
-#    angle1=angleList[0]
-#    angle2=angleList[1]
-#    """generates list of plane normals, given successive dihedral angles between planes.
-#    first and last are orthogonal, dimension is 3"""
-#    
-#    #test if valid planes using spherical excess formula 
-#    if angle1%(2*np.pi) < cfg.epsilon or angle2%(2*np.pi) < cfg.epsilon:
-#        raise Exception("Planes Cannot be Colinear")
-#
-#    if angle1 + angle2 + np.pi <= np.pi:
-#
-#        raise Exception("Invalid plane Configuration")
-#
-#    
-#    #normal1 is e_1, normal2 is rotated in direction of e_2 by specified angle
-#    #normal3 is in y,z plane (orthogonal to normal1) and is at angle2 away from normal2
-#    normal1 = np.array((1,0,0), dtype=np.float64)
-#    normal2 = np.array( (np.cos(angle1), np.sin(angle1), 0), dtype=np.float64 ) 
-#
-#    a = np.cos(angle2)/np.sin(angle1)
-#
-#    normal3 = np.array( (0, a, np.sqrt(1-a*a)),dtype=np.float64 ) 
-#
-#    print(f"Plane Angles: π/{np.pi/unitVecAngle(normal1,normal2)}, π/{np.pi/unitVecAngle(normal2,normal3)}, π/{np.pi/unitVecAngle(normal3,normal1)}")
-#
-#    print("Normals")
-#    for normal in (normal1,normal2,normal3):
-#        print(tuple([round(x,3) for x in normal]))
-#    return normal1,normal2,normal3
 
 def generatePlanes(angleList):
     """generates list of plane normals, given successive dihedral angles between planes.
     first and last are orthogonal, works in any dimension"""
     dim = len(angleList)+1
 
-    #normal1 is e_1, normal2 is rotated in direction of e_2 by specified angle
-    #normal3 is in y,z plane (orthogonal to normal1) and is at angle2 away from normal2
     normal1 = np.zeros(dim, dtype=np.float64)
     normal1[0] = 1.
     normals=[normal1]
@@ -74,17 +37,6 @@ def generatePlanes(angleList):
 
 
     return normals
-
-#def generateRep(generators,prevRep,n):
-#    """makes coset representitive using generators and a number
-#    should go on random walk though entire reflection space"""
-#    if n > 10000:
-#        raise Exception("Coset Generation Failed")
-#    
-#    rep = np.matmul( generators[-n%len(generators)] , prevRep)
-#    #rep /= abs(np.linalg.det(rep))
-#    return rep
-
 
 def generateRep(generators,prevRep,n):
     """counting algorithm for generating group elements using the least possible number of products"""
@@ -189,21 +141,6 @@ def findReflectionGroup(generators,groupOrder):
     return group
 
 
-#def findReflectionGroup(generators,groupOrder):
-#    group = []
-#    i = 0
-#
-#    identity =  np.identity(generators[0].shape[0])
-#    while len(group)<groupOrder:
-#        print(i,len(group))
-#        group.append(generateRep(generators,identity,i))
-#        removeDupes(group)
-#        i+=1
-#    return group
-        
-
-
-
 def hyperplaneIntersections(normals):
     """Finds vertices of the simplex that makes the primary chamber of the kalidoscope
     that is to say it finds points which lay on the n-sphere and are also on all but one
@@ -274,7 +211,5 @@ def getPoints(point,group, projection,scalars=None):
     
         np.matmul(orbit,rot,orbit)
     orbit = projection(orbit,len(orbit[0]))
-    #if type(projection)!= type(None):
-    #    orbit = np.matmul(orbit,projection.T)
-#
+
     return orbit

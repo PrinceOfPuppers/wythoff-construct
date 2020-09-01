@@ -7,6 +7,7 @@ from mayavi.core.ui.api import MayaviScene, SceneEditor, MlabSceneModel
 
 import config as cfg
 
+from coxeter import coxeterLookup
 from groupGen import generatePlanes,hyperplaneIntersections,findReflectionGroup,getSeedPoint,getPoints,getPointsAndFaces
 from helpers import reflectionMatrix,orthographicProjection,perspectiveProjection
 
@@ -71,7 +72,7 @@ class UI(HasTraits):
         else:
             self.rotationSliders = None
 
-        kals = cfg.coxeterLookup(self.dimension)
+        kals = coxeterLookup(self.dimension)
 
 
         self.kalidoscope=DropDown(kals.keys())
@@ -82,7 +83,8 @@ class UI(HasTraits):
         vertices,faces = getPointsAndFaces(seed,self.group,self.projection,self.rotationSliders)
         self.polydata = getPolydata(vertices,faces)
 
-        self.surfaceActor = mlab.pipeline.surface(self.polydata, name="faces", opacity = 1,figure=self.scene.mayavi_scene).actor
+        self.surfaceActor = mlab.pipeline.surface(self.polydata, name="faces", opacity = 1,figure=self.scene.mayavi_scene,colormap = cfg.cmap).actor
+
         mlab.pipeline.surface(self.polydata, name="wireframe", opacity = 1,representation='wireframe',color=(0,0,0),figure=self.scene.mayavi_scene)
 
         self.interactive = True
@@ -148,7 +150,7 @@ class UI(HasTraits):
                 self.rotationStr=""
                 self.rotationSliders = None
             
-            kals = cfg.coxeterLookup(dim)
+            kals = coxeterLookup(dim)
 
             self.kalidoscope = DropDown(kals.keys())
             kal = kals[self.kalidoscope[0]]
@@ -213,7 +215,7 @@ class UI(HasTraits):
                 self.seedSliders[i]=(1/(self.dimension))**2
 
 
-            kal = cfg.coxeterLookup(self.dimension)[event.new]
+            kal = coxeterLookup(self.dimension)[event.new]
             t = getMili()
 
             self.updatePointsAndFaces(kal)
@@ -233,7 +235,6 @@ class UI(HasTraits):
         #exponenet is to make the slider have a more linear feel
         self.surfaceActor.property.opacity= event.new**3
     
-
 
 if __name__ == "__main__":
     ui = UI()

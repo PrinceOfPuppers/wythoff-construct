@@ -4,24 +4,10 @@ import config as cfg
 from scipy.spatial import ConvexHull
 from scipy.linalg import null_space
 
-
-
-def mapArrayList(arr,arrList):
-    for i,a in enumerate(arrList):
-        arrList[i] = np.matmul(arr,a)
-
-def mulList(arrList):
-    result = arrList[0].copy()
-    for arr in arrList[1:]:
-        result = np.matmul(result,arr)
-    return result
-
 def areEqual(arr1, arr2):
-
     return (abs(arr1-arr2) < cfg.epsilon).all()
 
 def isInList(arr,arrList):
-
     for otherArr in arrList:
         if areEqual(arr,otherArr):
             return True
@@ -32,7 +18,7 @@ def removeDupes(arr):
     return np.unique(arr.round(5),axis=0)
 
 def embed(big,small,x,y):
-
+    """embeds smaller matrix in larger matrix starting at corner x,y. indices also wrap"""
     bigx,bigy = big.shape 
     smallx,smally = small.shape
 
@@ -77,7 +63,11 @@ def findFaces(pointList):
     """takes in polytope vertices and finds all flat convex 2d faces
     returns indices of face vertices"""
 
-    hull = ConvexHull(pointList,qhull_options="C-0")
+    #op = "C-0" # good for dim<5 and for [3,3,3,3], breaks with [3,3,3,4]
+    op = "Q12" # works for [3,3,3,4]
+    if len(pointList) == 0:
+        return pointList
+    hull = ConvexHull(pointList, qhull_options=op)
     #print("got hull")
     faces = []
     if pointList[0].size == 2:
@@ -193,36 +183,11 @@ def findEdges(pointList):
     
     return edges
 
-def getProjection(scalars):
-    """generates a projection matrix (orthonormal basis vectors for dim 3 subspace) given a set of scalars
-    dim is assumed to be number of scalars + 1, method used is by generating normal of subspace and finding
-    its nullspace"""
-
-    dim = len(scalars)+1
-    if dim <4:
-        return None
-    #generates vector on hyper sphere given by angles in scalars
-    sines=1
-    normal = np.zeros(dim)
-    normal[0] = 1
-    for i in range(1,dim):
-        normal[i-1]*=np.cos(scalars[i-1])
-
-        sines*=np.sin(scalars[i-1])
-
-        normal[i]=sines
-
-    zeroVec = np.zeros(dim)
-    projection = null_space( np.array( (normal, zeroVec) )).T[:3]
-
-
-    return projection
-
 
 def orthographicProjection(points,dim):
     if dim>3:
         basis = np.zeros((dim,3))
-        basis[0][0] = basis[1][1] = basis[2][2] =1
+        basis[0][0] = basis[1][1] = basis[2][2] = 1
         return np.matmul(points,basis)
     return points
 

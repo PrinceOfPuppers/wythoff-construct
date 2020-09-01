@@ -2,13 +2,12 @@ import numpy as np
 from mayavi import mlab
 from tvtk.api import tvtk
 
-from helpers import findFaces,mapArrayList
+from helpers import findFaces
 
 def getPolydata(pointList,faces):
     scalars = []
     for face in faces:
         scalars.append(len(face))
-
 
     polydata = tvtk.PolyData(points = pointList, polys = faces)
 
