@@ -1,10 +1,12 @@
 import numpy as np
-
+from os import listdir
 from scipy.optimize import minimize
-
+import pickle
 
 import project.config as cfg
-from project.helpers import areEqual,isInList,reflectionMatrix,unitVecAngle,findFaces,orthographicProjection,rotationMatrix,perspectiveProjection
+from project.helpers import (areEqual,isInList,reflectionMatrix,unitVecAngle,findFaces,orthographicProjection,
+                            rotationMatrix,perspectiveProjection,getPolydata,createDir)
+
 
 
 def generatePlanes(angleList):
@@ -28,16 +30,6 @@ def generatePlanes(angleList):
         message+= f"π/{np.pi/unitVecAngle(normals[i],normals[i+1])}, "
     print(message)
 
-    message = "normal lengths: "
-    for i in range(dim):
-        message+= f"{np.dot(normals[i],normals[i])}, "
-    print(message)
-
-    print("Normals")
-    for normal in normals:
-        print(tuple([round(x,3) for x in normal]))
-
-
     return normals
 
 def generateRep(generators,prevRep,n):
@@ -58,7 +50,6 @@ def generateRep(generators,prevRep,n):
         
         base*=numGens
     
-    #print(indices)
     return rep
 
 
@@ -66,6 +57,7 @@ def findReflectionGroup(generators,groupOrder):
     """Takes in list of n by n reflection matrices which generate a symmetry group
     The method used is by finding a subgroup, then finding all of its cosets"""
 
+    print("Generating Group...")
     #generating subgroup
     subGen1 = generators[0]
     subGen2 = generators[1] #note subGen2 isnt in the subgroup, subGen2*subGen1 is, along with further products
@@ -140,7 +132,7 @@ def findReflectionGroup(generators,groupOrder):
         raise Exception("Failed To Generate Whole Symmetry Group")
 
     print(f"Group Order: {len(group)}, Subgroup Order: {subgroupOrder}, index: {numCosets}")
-    return group
+    return np.array(group)
 
 
 def hyperplaneIntersections(normals):
@@ -162,7 +154,7 @@ def hyperplaneIntersections(normals):
         intersection = minimize( linearSystem, guess, method='SLSQP', constraints=constraints, options={'disp': False})
         intersections.append(intersection.x)
 
-    return intersections
+    return np.array(intersections)
 
 def getSeedPoint(scalers,intersections):
     """uses the intersections from hyperplaneIntersections as a basis to get a seed point in the primary
@@ -185,13 +177,19 @@ def orbitPoint(point,group):
 
     return points
 
+
+
+
+
+# Wrappers
+
 def getPointsAndFaces(point, group, projection, scalars = None):
     """wrapper for orbitPoints, find faces and project orbit onto 3 dimensions (useful due to order sensitivity)"""
 
     orbit = orbitPoint(point, group)
-    print("orbited")
+    print("Points Orbited, Getting Faces...")
     faces = findFaces(orbit)
-    print("got faces")
+    print("Got Faces")
 
     dim = len(orbit[0])
     if scalars!= None:
@@ -215,3 +213,64 @@ def getPoints(point,group, projection,scalars=None):
     orbit = projection(orbit,len(orbit[0]))
 
     return orbit
+
+
+
+
+
+class KalidoscopeGenerator:
+    def __init__(self): #kal is inital kalidoscope when the application first loads up
+        createDir(cfg.savePath)
+        self.saves = [save for save in listdir(cfg.savePath)]
+
+
+        self.savedGroups = {save: np.load(f"{cfg.savePath}/{save}/group.npy",allow_pickle=True) for save in self.saves} # ie) "[3,4]": groupArrrayFor[3,4]
+        self.savedIntersections = {save: np.load(f"{cfg.savePath}/{save}/intersections.npy",allow_pickle=True) for save in self.saves}
+        self.savedFaces = {save: pickle.load(open(f"{cfg.savePath}/{save}/faces.pkl", 'rb')) for save in self.saves}
+        
+        self.projection = perspectiveProjection
+    
+    def initalizeKalidoscope(self,kal,seedSliders,rotationSliders):
+        if kal.label in self.saves:
+            self.group = self.savedGroups[kal.label]
+            self.intersections = self.savedIntersections[kal.label]
+            faces = self.savedFaces[kal.label]
+            vertices = self.updatePoints(seedSliders,rotationSliders)
+        else:
+            normals = generatePlanes(kal.planeAngles)
+            generators = [reflectionMatrix(normal) for normal in normals]
+            
+            self.group = findReflectionGroup(generators,kal.order)
+            self.intersections = hyperplaneIntersections(normals)
+
+            seed=getSeedPoint(seedSliders,self.intersections)
+            vertices,faces = getPointsAndFaces(seed,self.group,self.projection,rotationSliders)
+
+            #saves results
+            createDir(f"{cfg.savePath}/{kal.label}")
+            np.save(f"{cfg.savePath}/{kal.label}/group",self.group)
+            np.save(f"{cfg.savePath}/{kal.label}/intersections",self.intersections)
+            pickle.dump(faces,open(f"{cfg.savePath}/{kal.label}/faces.pkl", 'wb'))
+
+            self.saves.append(kal.label)
+            self.savedGroups[kal.label] = self.group
+            self.savedIntersections[kal.label] = self.intersections
+            self.savedFaces[kal.label] = faces
+        
+        newPolydata = getPolydata(vertices,faces)
+
+        return newPolydata
+
+
+    def updatePoints(self,seedSliders,rotationSliders):
+        """ Used to update Points of the polytope using the same kalidoscope""" 
+        seed=getSeedPoint(seedSliders,self.intersections)
+        vertices = getPoints(seed,self.group,self.projection,rotationSliders)
+
+        return vertices
+    
+    def changeProjection(self,typeStr):
+        if typeStr == "orthographic":
+            self.projection = orthographicProjection
+        else:
+            self.projection = perspectiveProjection

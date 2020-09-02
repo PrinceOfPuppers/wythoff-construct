@@ -8,10 +8,10 @@ from mayavi.core.ui.api import MayaviScene, SceneEditor, MlabSceneModel
 import project.config as cfg
 
 from project.coxeter import coxeterLookup
-from project.groupGen import generatePlanes,hyperplaneIntersections,findReflectionGroup,getSeedPoint,getPoints,getPointsAndFaces
-from project.helpers import reflectionMatrix,orthographicProjection,perspectiveProjection
+from project.groupGen import KalidoscopeGenerator
 
-from project.mayAviPlotting import getPolydata
+
+
 from project.uiElements import DropDown,SliderList
 
 from datetime import datetime, timezone, timedelta
@@ -68,7 +68,9 @@ class Ui(HasTraits):
         
         self.seedSliders = SliderList(self.dimension-1,1/(self.dimension-1)**2)
         self.perspectiveEnum = "projection"
-        self.projection = perspectiveProjection
+
+        
+
         if self.dimension>3:
             self.rotationStr="Rotation (multiple of 2π): "
 
@@ -78,14 +80,11 @@ class Ui(HasTraits):
 
         kals = coxeterLookup(self.dimension)
 
-
         self.kalidoscope=DropDown(kals.keys())
         kal = kals[self.kalidoscope[0]]
 
-        seed = self.initalizeKalidoscope(kal)
-
-        vertices,faces = getPointsAndFaces(seed,self.group,self.projection,self.rotationSliders)
-        self.polydata = getPolydata(vertices,faces)
+        self.kalGen = KalidoscopeGenerator()
+        self.polydata = self.kalGen.initalizeKalidoscope(kal,self.seedSliders,self.rotationSliders)
 
         self.surfaceActor = mlab.pipeline.surface(self.polydata, name="faces", opacity = 1,figure=self.scene.mayavi_scene,colormap = cfg.cmap).actor
 
@@ -93,30 +92,9 @@ class Ui(HasTraits):
 
         self.interactive = True
         
-    def initalizeKalidoscope(self,kal):
-        normals = generatePlanes(kal.planeAngles)
-        generators = [reflectionMatrix(normal) for normal in normals]
 
-        self.group = findReflectionGroup(generators,kal.order)
-        self.intersections = hyperplaneIntersections(normals)
-        seed=getSeedPoint(self.seedSliders,self.intersections)
 
-        return seed
-
-    def updatePoints(self):
-        #updates points
-        seed=getSeedPoint(self.seedSliders,self.intersections)
-        vertices = getPoints(seed,self.group,self.projection,self.rotationSliders)
-
-        self.polydata.points=vertices
-
-    def updatePointsAndFaces(self,kal):
-        seed = self.initalizeKalidoscope(kal)
-
-        vertices,faces = getPointsAndFaces(seed,self.group,self.projection,self.rotationSliders)
-
-        newPolydata = getPolydata(vertices,faces)
-
+    def updatePolydata(self,newPolydata):
         self.polydata.points = newPolydata.points
         self.polydata.polys = newPolydata.polys
 
@@ -125,12 +103,9 @@ class Ui(HasTraits):
 
     @observe("projectionType")
     def perspective_changed(self,event):
-        if event.new == "orthographic":
-            self.projection = orthographicProjection
-        else:
-            self.projection = perspectiveProjection
-        
-        self.updatePoints()
+        self.kalGen.changeProjection(event.new)
+
+        self.polydata.points = self.kalGen.updatePoints(self.seedSliders,self.rotationSliders)
     
     @observe("dimension")
     def dimension_changed(self,event):
@@ -159,7 +134,8 @@ class Ui(HasTraits):
             self.kalidoscope = DropDown(kals.keys())
             kal = kals[self.kalidoscope[0]]
 
-            self.updatePointsAndFaces(kal)
+            newPolydata = self.kalGen.initalizeKalidoscope(kal,self.seedSliders,self.rotationSliders)
+            self.updatePolydata(newPolydata)
 
             self.interactive = True
 
@@ -189,7 +165,7 @@ class Ui(HasTraits):
                         self.seedSliders[i] = val
 
 
-            self.updatePoints()
+            self.polydata.points = self.kalGen.updatePoints(self.seedSliders,self.rotationSliders)
 
             self.interactive = True
 
@@ -197,7 +173,9 @@ class Ui(HasTraits):
     def rotationSliders_changed(self,event):
         if self.interactive:
             self.interactive = False
-            self.updatePoints()
+            
+            self.polydata.points = self.kalGen.updatePoints(self.seedSliders,self.rotationSliders)
+
             self.interactive = True
 
     @observe("kalidoscope:enum")
@@ -217,15 +195,16 @@ class Ui(HasTraits):
             kal = coxeterLookup(self.dimension)[event.new]
             t = getMili()
 
-            self.updatePointsAndFaces(kal)
+            newPolydata = self.kalGen.initalizeKalidoscope(kal,self.seedSliders,self.rotationSliders)
+            self.updatePolydata(newPolydata)
 
-            print("gentime: ",getMili()-t, " miliseconds")
+            print("Generation Time: ",getMili()-t, " miliseconds")
             # we now generate the shape with the proper vertex configuration (with the
             # sliders in the configuartion they where before)
             for i in range(len(self.seedSliders)):
                 self.seedSliders[i]=sliderVals[i]
 
-            self.updatePoints()
+            self.polydata.points = self.kalGen.updatePoints(self.seedSliders,self.rotationSliders)
 
             self.interactive=True
     

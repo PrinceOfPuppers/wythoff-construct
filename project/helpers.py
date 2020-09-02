@@ -1,9 +1,18 @@
 import numpy as np
+from os import path,mkdir
 
 from scipy.spatial import ConvexHull
 from scipy.linalg import null_space
 
+from tvtk.api import tvtk
+
 import project.config as cfg
+
+def createDir(path):
+    try:
+        mkdir(path)
+    except:
+        pass
 
 def areEqual(arr1, arr2):
     return np.allclose(arr1,arr2)
@@ -215,3 +224,16 @@ def perspectiveProjection(points,dim):
         projectedPoints[i] =sol[:len(planeBasis)]
 
     return perspectiveProjection(projectedPoints,dim-1)
+
+
+
+def getPolydata(pointList,faces):
+    scalars = []
+    for face in faces:
+        scalars.append(len(face))
+    polydata = tvtk.PolyData(points = pointList, polys = faces)
+
+    polydata.cell_data.scalars=scalars
+    polydata.cell_data.scalars.name = "celldata" 
+
+    return polydata
