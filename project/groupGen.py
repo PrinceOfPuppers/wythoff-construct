@@ -1,9 +1,11 @@
 import numpy as np
-import config as cfg
+
 from scipy.optimize import minimize
 
-from helpers import areEqual,isInList,reflectionMatrix,unitVecAngle,findFaces,orthographicProjection,rotationMatrix,perspectiveProjection
-from functools import reduce
+
+import project.config as cfg
+from project.helpers import areEqual,isInList,reflectionMatrix,unitVecAngle,findFaces,orthographicProjection,rotationMatrix,perspectiveProjection
+
 
 def generatePlanes(angleList):
     """generates list of plane normals, given successive dihedral angles between planes.

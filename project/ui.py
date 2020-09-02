@@ -5,14 +5,14 @@ from traits.api import HasTraits, Range, Instance, List, observe,Enum,String
 from traitsui.api import View, Item, Group, HGroup,RangeEditor,InstanceEditor
 from mayavi.core.ui.api import MayaviScene, SceneEditor, MlabSceneModel
 
-import config as cfg
+import project.config as cfg
 
-from coxeter import coxeterLookup
-from groupGen import generatePlanes,hyperplaneIntersections,findReflectionGroup,getSeedPoint,getPoints,getPointsAndFaces
-from helpers import reflectionMatrix,orthographicProjection,perspectiveProjection
+from project.coxeter import coxeterLookup
+from project.groupGen import generatePlanes,hyperplaneIntersections,findReflectionGroup,getSeedPoint,getPoints,getPointsAndFaces
+from project.helpers import reflectionMatrix,orthographicProjection,perspectiveProjection
 
-from mayAviPlotting import getPolydata
-from uiElements import DropDown,SliderList
+from project.mayAviPlotting import getPolydata
+from project.uiElements import DropDown,SliderList
 
 from datetime import datetime, timezone, timedelta
 
@@ -21,9 +21,12 @@ def getMili():
 
 
 
-class UI(HasTraits):
+class Ui(HasTraits):
     opacity = Range(0.,1.,1.)
-    dimension = Range(3,5,3,mode='spinner')
+    
+    dimension = Range(3,5,3,mode='enum')
+
+
     seedSliders=Instance(SliderList)
     rotationSliders = Instance(SliderList)
     kalidoscope = Instance(DropDown)
@@ -32,7 +35,6 @@ class UI(HasTraits):
     projTypeValues = ("perspective","orthographic")
     projectionType = Enum(values = "projTypeValues")
     rotationStr=String("")
-    blank=''
     seedPointStr="Seed Point Selection:"
 
     view = View(Group(
@@ -44,7 +46,6 @@ class UI(HasTraits):
                 Item('rotationSliders',editor = InstanceEditor(),style='custom',springy=False,show_label=False,height=0.0),
                 
                 HGroup(
-                    Item('blank',style='readonly',show_label=False, width = 0.1),
                     Item('dimension',springy=True,width=0.2),
                     
                     
@@ -56,6 +57,9 @@ class UI(HasTraits):
                     )
                 ),
                 resizable = True,
+                width = 0.5,
+                height = 0.9,
+                title= "Wythoff Construct"
             )
 
     def __init__(self):
@@ -230,8 +234,3 @@ class UI(HasTraits):
         #exponenet is to make the slider have a more linear feel
         self.surfaceActor.property.opacity= event.new**3
     
-
-if __name__ == "__main__":
-    ui = UI()
-
-    ui.configure_traits()

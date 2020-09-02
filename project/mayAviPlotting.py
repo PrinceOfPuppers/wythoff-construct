@@ -2,7 +2,7 @@ import numpy as np
 from mayavi import mlab
 from tvtk.api import tvtk
 
-from helpers import findFaces
+from project.helpers import findFaces
 
 def getPolydata(pointList,faces):
     scalars = []

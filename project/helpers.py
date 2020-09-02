@@ -1,11 +1,12 @@
 import numpy as np
-import config as cfg
 
 from scipy.spatial import ConvexHull
 from scipy.linalg import null_space
 
+import project.config as cfg
+
 def areEqual(arr1, arr2):
-    return (abs(arr1-arr2) < cfg.epsilon).all()
+    return np.allclose(arr1,arr2)
 
 def isInList(arr,arrList):
     for otherArr in arrList:
