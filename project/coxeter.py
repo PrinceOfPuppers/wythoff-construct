@@ -24,7 +24,7 @@ I_h = Kalidoscope(120,[pi/5,pi/3],"[3,5]")
 
 H_4 = Kalidoscope(14400,[pi/5,pi/3,pi/3],f"[3{expStr(2)},5]") 
 
-D_5h = Kalidoscope(4*5,[pi/5,pi/2],"[5,2]") #just as an example
+D_5h = Kalidoscope(4*5,[pi/5,pi/2],"[2,5]") #just as an example
 
 
 # 2 Infinite familys of kalidoscopes

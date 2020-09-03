@@ -1,5 +1,11 @@
 project/__pycache__
-project/savedKalidoscopes
+
+
+
+project/savedKalidoscopes/*
+!project/savedKalidoscopes/\[3²,5]
+!project/savedKalidoscopes/\[3³,4]
+
 
 traits-whls
 vtk-whls

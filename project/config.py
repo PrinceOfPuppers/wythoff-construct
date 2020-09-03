@@ -1,7 +1,7 @@
 from numpy import pi
 
 epsilon = 10e-3
-enableH_4 = False # takes a really long time to load
+enableH_4 = True # takes a really long time to load
 enableB_5 = True # takes a while to load
 
 savePath = "project/savedKalidoscopes"

@@ -116,16 +116,17 @@ class Ui(HasTraits):
             #add and adjust seed sliders
             self.seedSliders = SliderList(dim-1,1/(dim-1)**2)
 
-            #add and adjust rotation sliders
+            
             if dim>3:
-                #makes objects automaticaly transparent in higher dimensions
-                if 1 - self.opacity <cfg.epsilon:
-                    self.opacity = 0.4
+                #adjust opacity
+                self.opacity = 8/dim**2 - 0.1
 
+                #add and adjust rotation sliders
                 self.rotationStr="Rotation (multiple of 2π): "
                 self.rotationSliders = SliderList(3**(dim-2) - 3,0.0,dim - 2)
                 
             else:
+                self.opacity = 1.0
                 self.rotationStr=""
                 self.rotationSliders = None
             

@@ -180,14 +180,12 @@ def orbitPoint(point,group):
 
 
 
-
 # Wrappers
-
 def getPointsAndFaces(point, group, projection, scalars = None):
     """wrapper for orbitPoints, find faces and project orbit onto 3 dimensions (useful due to order sensitivity)"""
-
+    print("Orbiting Point...")
     orbit = orbitPoint(point, group)
-    print("Points Orbited, Getting Faces...")
+    print("Getting Faces...")
     faces = findFaces(orbit)
     print("Got Faces")
 
@@ -198,6 +196,8 @@ def getPointsAndFaces(point, group, projection, scalars = None):
             np.matmul(rotationMatrix(dim,i,2*np.pi*scalar),rot,rot)
 
         np.matmul(orbit,rot,orbit)
+    
+
     orbit = projection(orbit,len(orbit[0]))
     return orbit,faces
 
@@ -210,6 +210,7 @@ def getPoints(point,group, projection,scalars=None):
             np.matmul(rotationMatrix(dim,i,2*np.pi*scalar),rot,rot)
     
         np.matmul(orbit,rot,orbit)
+
     orbit = projection(orbit,len(orbit[0]))
 
     return orbit
@@ -221,12 +222,27 @@ def getPoints(point,group, projection,scalars=None):
 class KalidoscopeGenerator:
     def __init__(self): #kal is inital kalidoscope when the application first loads up
         createDir(cfg.savePath)
-        self.saves = [save for save in listdir(cfg.savePath)]
 
+        self.saves = []
+        
+        self.savedGroups = {}
+        self.savedIntersections = {}
+        self.savedFaces = {}
+        
+        for save in listdir(cfg.savePath):
+            try:
+                
+                group =  np.load(f"{cfg.savePath}/{save}/group.npy",allow_pickle=True)
+                intersection = np.load(f"{cfg.savePath}/{save}/intersections.npy",allow_pickle=True)
+                faces = pickle.load(open(f"{cfg.savePath}/{save}/faces.pkl", 'rb'))
 
-        self.savedGroups = {save: np.load(f"{cfg.savePath}/{save}/group.npy",allow_pickle=True) for save in self.saves} # ie) "[3,4]": groupArrrayFor[3,4]
-        self.savedIntersections = {save: np.load(f"{cfg.savePath}/{save}/intersections.npy",allow_pickle=True) for save in self.saves}
-        self.savedFaces = {save: pickle.load(open(f"{cfg.savePath}/{save}/faces.pkl", 'rb')) for save in self.saves}
+            except:
+                continue
+                
+            self.saves.append(save)
+            self.savedGroups[save] = group 
+            self.savedIntersections[save] =  intersection
+            self.savedFaces[save] =  faces
         
         self.projection = perspectiveProjection
     
