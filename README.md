@@ -16,17 +16,18 @@ $ pip3 install .
 to install VTK and traits on windows through pypi requires both 64 bit python and Build Tools for Visual Studio.
 however you can also get versions precomipled for 32 bit python from https://www.lfd.uci.edu/~gohlke/pythonlibs/
 download the appropriate ones for your python version (ie for python 3.6 look for the whl with cp36) and install
-using pip, ie)
+using pip, while in the same directory as the downloaded files ie)
 ```
 pip3 install VTK‑9.0.1‑cp36‑cp36m‑win32.whl
 pip3 install traits‑6.1.1‑cp39‑cp39‑win32.whl
 ```
-while in the same directory as the downloaded files. Then simply run
+Then simply run
 ```
 git clone https://github.com/PrinceOfPuppers/wythoff-construct.git
 cd wythoff-construct
 pip3 install .
 ```
+If you have Build Tools for Visual Studio and 64 bit python, skip the first step.
 
 ### To Uninstall...  
 ```pip3 uninstall wythoff-construct```
