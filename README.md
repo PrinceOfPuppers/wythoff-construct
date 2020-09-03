@@ -1,4 +1,4 @@
-<img src="https://drive.google.com/uc?id=1nsABHRojHFkD2RycnrKheTq5WSyvzfN2" />
+<img src="https://drive.google.com/uc?id=1LQgO10Ou5T1-g3NQmHRGWxLDjJ_ekmUP" />
 
 # wythoff-construct
 
