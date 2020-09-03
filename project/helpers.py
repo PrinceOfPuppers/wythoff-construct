@@ -195,17 +195,19 @@ def findEdges(pointList):
 
 
 def orthographicProjection(points,dim):
-    if dim>3:
-        basis = np.zeros((dim,3))
-        basis[0][0] = basis[1][1] = basis[2][2] = 1
-        return np.matmul(points,basis)
-    return points
+    if dim==3:
+        return points
+    basis = np.zeros((dim,3))
+    basis[0][0] = basis[1][1] = basis[2][2] = 1
+    return np.matmul(points,basis)
+
+
 
 def perspectiveProjection(points,dim):
     if dim == 3:
         return points
 
-    projectedPoints = np.empty((len(points),dim-1))
+
     planePos = np.zeros(dim)
     planePos[0] = 3
 
@@ -214,17 +216,15 @@ def perspectiveProjection(points,dim):
     lightPos = np.zeros(dim)
     lightPos[0] = 1.8
     
-    for i,point in enumerate(points):
-        v = point - lightPos
+    vs = points - lightPos
+    cat = np.vstack((planeBasis,lightPos-planePos))
 
+    sol =  np.linalg.solve(cat.T,vs.T)
+    consts=sol[-1]
+    points=sol[:-1]
+    points/=consts
 
-        cat = np.vstack((planeBasis,-v))
-
-        sol =  np.linalg.solve(cat.T,lightPos-planePos)
-        projectedPoints[i] =sol[:len(planeBasis)]
-
-    return perspectiveProjection(projectedPoints,dim-1)
-
+    return perspectiveProjection(points.T,dim-1)
 
 
 def getPolydata(pointList,faces):
