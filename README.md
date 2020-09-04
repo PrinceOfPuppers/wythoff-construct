@@ -10,7 +10,7 @@ Install Package With PIP
 ```
 $ git clone https://github.com/PrinceOfPuppers/wythoff-construct.git
 $ cd wythoff-construct
-$ pip3 install .
+$ pip install .
 ```
 ### Windows:
 If you have 64 bit python and Build Tools for Visual Studio, follow the linux setup instructions. Otherwise
@@ -19,13 +19,13 @@ run the following
 ```
 git clone https://github.com/PrinceOfPuppers/wythoff-construct.git
 cd wythoff-construct
-python3 winInstall.py
+python winInstall.py
 ```
 This will install vtk and traits from https://www.lfd.uci.edu/~gohlke/pythonlibs/ which usually require
 both 64 bit python and Build Tools for Visual Studio.
 
 ### To Uninstall...  
-```pip3 uninstall wythoff-construct```
+```pip uninstall wythoff-construct```
 
 ## Usage
 Once installed using pip the following command can be executed from any working directory
