@@ -14,8 +14,11 @@ $ pip install .
 ```
 ### Windows:
 #### Without command prompt (Easy):
-Download the zip file from https://github.com/PrinceOfPuppers/wythoff-construct/archive/master.zip
-extract it and double click winInstall.py, run it by double clicking wythoff-construct.py.
+Make sure you have [python](https://www.python.org/) installed, 
+during the installation check add python to path.
+
+Once you have python, download the zip file from [here](https://github.com/PrinceOfPuppers/wythoff-construct/archive/master.zip),
+extract it and double click winInstall.py setup the program, run the program by double clicking wythoff-construct.py.
 
 
 #### With command prompt and Git:
