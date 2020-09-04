@@ -13,9 +13,12 @@ $ cd wythoff-construct
 $ pip install .
 ```
 ### Windows:
-If you have 64 bit python and Build Tools for Visual Studio, follow the linux setup instructions. Otherwise
-run the following
+#### Without command prompt (Easy):
+Download the zip file from https://github.com/PrinceOfPuppers/wythoff-construct/archive/master.zip
+extract it and double click winInstall.py, run it by double clicking wythoff-construct.py.
 
+
+#### With command prompt and Git:
 ```
 git clone https://github.com/PrinceOfPuppers/wythoff-construct.git
 cd wythoff-construct

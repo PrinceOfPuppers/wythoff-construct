@@ -1,6 +1,6 @@
 
 from traits.api import HasTraits, Range, List, Enum, Int
-from traitsui.api import View, Item, Group, ListEditor,RangeEditor,DefaultOverride
+from traitsui.api import View, Item, Group, ListEditor,RangeEditor
 
 
 
