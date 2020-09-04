@@ -15,5 +15,6 @@ if __name__ == "__main__":
     if platform == 'win32' or platform =='amd64':
         traitsURL = f"https://download.lfd.uci.edu/pythonlibs/w3jqiv8s/traits-6.1.1-{ver}-{ver}-{platform}.whl"
         vtkURL = f"https://download.lfd.uci.edu/pythonlibs/w3jqiv8s/VTK-9.0.1-{ver}-{ver}-{platform}.whl"
-
+        installManual(traitsURL)
+        installManual(vtkURL)
     installRest()
