@@ -1,10 +1,10 @@
-from numpy import pi
+import pathlib
 
 epsilon = 10e-3
 enableH_4 = True # takes a really long time to load
 enableB_5 = True # takes a while to load
 
-savePath = "project/savedKalidoscopes"
+savePath = str(pathlib.Path(__file__).parent.absolute())+"/savedKalidoscopes"
 
 colormaps = ['Accent', 'Blues', 'BrBG', 'BuGn', 'BuPu', 'CMRmap', 'Dark2', 'GnBu', 'Greens', 'Greys', 'OrRd', 'Oranges', 'PRGn', 'Paired', 
             'Pastel1', 'Pastel2', 'PiYG', 'PuBu', 'PuBuGn', 'PuOr', 'PuRd', 'Purples', 'RdBu', 'RdGy', 'RdPu', 'RdYlBu', 'RdYlGn', 'Reds', 'Set1', 'Set2', 
