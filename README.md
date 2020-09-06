@@ -44,7 +44,9 @@ pip uninstall mayavi
 if you wish to remove those too.
 
 ### Linux:  
-```pip uninstall wythoff-construct```
+```
+pip uninstall wythoff-construct
+```
 you may also wish to uninstall the dependancies: vtk, mayavi, numpy, scipy, PyQt5
 
 
