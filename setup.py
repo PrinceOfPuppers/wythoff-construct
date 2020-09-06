@@ -1,15 +1,11 @@
 import setuptools
 
-with open("README.md", "r") as fh:
-    long_description = fh.read()
-
 setuptools.setup(
     name="wythoff-construct", # Replace with your own username
     version="0.0.1",
     author="Joshua McPherson",
     author_email="joshuamcpherson5@gmail.com",
     description="Constructs and visualizes hyperdimensional polytopes created using Wythoff construction",
-    long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/PrinceOfPuppers/wythoff-construct",
     packages=setuptools.find_packages(),
