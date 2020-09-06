@@ -38,9 +38,9 @@ $ pip install .
 Simply delete the folder and run:
 ```
 pip uninstall vtk
-pip uninstall mayavi
+pip uninstall traits
 ```
-... to uninstall the manually added dependancies. You can also run this on scipy, numpy and PyQt5
+... to uninstall the manually added dependancies. You can also run this on mayavi, scipy, numpy and PyQt5
 if you wish to remove those too.
 
 ### Linux:  
