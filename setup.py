@@ -8,6 +8,7 @@ setuptools.setup(
     description="Constructs and visualizes hyperdimensional polytopes created using Wythoff construction",
     url="https://github.com/PrinceOfPuppers/wythoff-construct",
     packages=setuptools.find_packages(),
+    include_package_data=True,
     install_requires=['numpy','scipy','PyQt5',"mayavi"],
     classifiers=[
         "Programming Language :: Python :: 3",
