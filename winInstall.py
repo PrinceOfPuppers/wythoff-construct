@@ -7,7 +7,9 @@ def installManual(URL):
 
 
 def installRest():
-    subprocess.check_call([executable, "-m", "pip", "install", "."])
+    for package in ['numpy','scipy','PyQt5',"mayavi"]:
+        subprocess.check_call([executable, "-m", "pip", "install",package])
+
 
 if __name__ == "__main__":
     ver =f"cp{version_info[0]}{version_info[1]}"
@@ -17,4 +19,4 @@ if __name__ == "__main__":
         vtkURL = f"https://download.lfd.uci.edu/pythonlibs/w3jqiv8s/VTK-9.0.1-{ver}-{ver}-{platform}.whl"
         installManual(traitsURL)
         installManual(vtkURL)
-    installRest()
+        installRest()

@@ -33,7 +33,20 @@ $ pip install .
 ```
 
 ### To Uninstall...  
+
+### Windows
+Simply delete the folder and run:
+```
+pip uninstall vtk
+pip uninstall mayavi
+```
+... to uninstall the manually added dependancies. You can also run this on scipy, numpy and PyQt5
+if you wish to remove those too.
+
+### Linux:  
 ```pip uninstall wythoff-construct```
+you may also wish to uninstall the dependancies: vtk, mayavi, numpy, scipy, PyQt5
+
 
 ## Usage
 Once installed using pip the following command can be executed from any working directory
