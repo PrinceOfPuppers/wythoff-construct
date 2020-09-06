@@ -6,7 +6,6 @@ setuptools.setup(
     author="Joshua McPherson",
     author_email="joshuamcpherson5@gmail.com",
     description="Constructs and visualizes hyperdimensional polytopes created using Wythoff construction",
-    long_description_content_type="text/markdown",
     url="https://github.com/PrinceOfPuppers/wythoff-construct",
     packages=setuptools.find_packages(),
     include_package_data = True,

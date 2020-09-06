@@ -5,27 +5,35 @@
 > Constructs and visualizes hyperdimensional polytopes created using Wythoff construction
 
 ## Setup
+
+### Windows:
+#### Without command prompt (Easy):
+Make sure you have [python](https://www.python.org/) installed, 
+during the installation check add python to path.
+
+Once you have python, download the zip file from [here](https://github.com/PrinceOfPuppers/wythoff-construct/archive/master.zip),
+extract it and double click winInstall.py setup the program, run the program by double clicking wythoff-construct.py.
+
+
+#### With command prompt and Git:
+```
+git clone https://github.com/PrinceOfPuppers/wythoff-construct.git
+cd wythoff-construct
+python winInstall.py
+```
+This will install vtk and traits from https://www.lfd.uci.edu/~gohlke/pythonlibs/ which usually require
+both 64 bit python and Build Tools for Visual Studio.
+
 ### Linux:  
 Install Package With PIP
 ```
 $ git clone https://github.com/PrinceOfPuppers/wythoff-construct.git
 $ cd wythoff-construct
-$ pip3 install .
+$ pip install .
 ```
-### Windows:
-If you have 64 bit python and Build Tools for Visual Studio, follow the linux setup instructions. Otherwise
-run the following
-
-```
-git clone https://github.com/PrinceOfPuppers/wythoff-construct.git
-cd wythoff-construct
-python3 winInstall.py
-```
-This will install vtk and traits from https://www.lfd.uci.edu/~gohlke/pythonlibs/ which usually require
-both 64 bit python and Build Tools for Visual Studio.
 
 ### To Uninstall...  
-```pip3 uninstall wythoff-construct```
+```pip uninstall wythoff-construct```
 
 ## Usage
 Once installed using pip the following command can be executed from any working directory
