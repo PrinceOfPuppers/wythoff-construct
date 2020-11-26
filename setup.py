@@ -1,7 +1,7 @@
 import setuptools
 
 setuptools.setup(
-    name="wythoff-construct", # Replace with your own username
+    name="wythoff-construct",
     version="0.0.1",
     author="Joshua McPherson",
     author_email="joshuamcpherson5@gmail.com",
