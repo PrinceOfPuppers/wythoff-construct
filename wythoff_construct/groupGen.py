@@ -3,8 +3,8 @@ from os import listdir
 from scipy.optimize import minimize
 import pickle
 
-import project.config as cfg
-from project.helpers import (areEqual,isInList,reflectionMatrix,unitVecAngle,findFaces,orthographicProjection,
+import wythoff_construct.config as cfg
+from wythoff_construct.helpers import (areEqual,isInList,reflectionMatrix,unitVecAngle,findFaces,orthographicProjection,
                             rotationMatrix,perspectiveProjection,getPolydata,createDir)
 
 

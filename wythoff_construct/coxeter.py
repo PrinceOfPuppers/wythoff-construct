@@ -2,7 +2,7 @@
 from numpy import pi
 from math import factorial
 
-import project.config as cfg
+import wythoff_construct.config as cfg
 
 exponents=["⁰", "¹","²", "³", "⁴", "⁵", "⁶","⁷",  "⁸", "⁹"]
 

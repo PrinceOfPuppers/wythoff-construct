@@ -1,11 +1,10 @@
-project/__pycache__
+wythoff_construct/__pycache__
 
 
 
-project/savedKalidoscopes/*
-!project/savedKalidoscopes/\[3²,5]
-!project/savedKalidoscopes/\[3³,4]
-
-
-traits-whls
-vtk-whls
+wythoff_construct/savedKalidoscopes/*
+!wythoff_construct/savedKalidoscopes/\[3²,5]
+!wythoff_construct/savedKalidoscopes/\[3³,4]
+wythoff_construct.egg-info
+dist
+build

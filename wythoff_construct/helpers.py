@@ -6,7 +6,7 @@ from scipy.linalg import null_space
 
 from tvtk.api import tvtk
 
-import project.config as cfg
+import wythoff_construct.config as cfg
 
 def createDir(path):
     try:

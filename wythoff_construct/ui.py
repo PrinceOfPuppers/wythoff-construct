@@ -5,14 +5,14 @@ from traits.api import HasTraits, Range, Instance, List, observe,Enum,String
 from traitsui.api import View, Item, Group, HGroup,RangeEditor,InstanceEditor
 from mayavi.core.ui.api import MayaviScene, SceneEditor, MlabSceneModel
 
-import project.config as cfg
+import wythoff_construct.config as cfg
 
-from project.coxeter import coxeterLookup
-from project.groupGen import KalidoscopeGenerator
+from wythoff_construct.coxeter import coxeterLookup
+from wythoff_construct.groupGen import KalidoscopeGenerator
 
 
 
-from project.uiElements import DropDown,SliderList
+from wythoff_construct.uiElements import DropDown,SliderList
 
 from datetime import datetime, timezone, timedelta
 
