@@ -3,57 +3,21 @@
 # wythoff-construct
 
 > Constructs and visualizes hyperdimensional polytopes created using Wythoff construction
-
-## Setup
-
-### Windows:
-#### Without command prompt (Easy):
-Make sure you have [python](https://www.python.org/) installed, 
-during the installation check add python to path.
-
-Once you have python, download the zip file from [here](https://github.com/PrinceOfPuppers/wythoff-construct/archive/master.zip),
-extract it and double click winInstall.py setup the program, run the program by double clicking wythoff-construct.py.
+- [INSTALLATION](#INSTALLATION)
+- [ABOUT](#ABOUT)
+- [USAGE](#USAGE)
+- [EXAMPLES](#EXAMPLES)
 
 
-#### With command prompt and Git:
-```
-git clone https://github.com/PrinceOfPuppers/wythoff-construct.git
-cd wythoff-construct
-python winInstall.py
-```
-This will install vtk and traits from https://www.lfd.uci.edu/~gohlke/pythonlibs/ which usually require
-both 64 bit python and Build Tools for Visual Studio.
 
-### Linux:  
-Install Package With PIP
-```
-$ git clone https://github.com/PrinceOfPuppers/wythoff-construct.git
-$ cd wythoff-construct
-$ pip install .
+# INSTALLATION
+``` 
+pip install wythoff-construct
 ```
 
-### To Uninstall...  
-
-### Windows
-Simply delete the folder and run:
-```
-pip uninstall vtk
-pip uninstall traits
-```
-... to uninstall the manually added dependancies. You can also run this on mayavi, scipy, numpy and PyQt5
-if you wish to remove those too.
-
-### Linux:  
-```
-pip uninstall wythoff-construct
-```
-you may also wish to uninstall the dependancies: vtk, mayavi, numpy, scipy, PyQt5
-
-
-## Usage
-Once installed using pip the following command can be executed from any working directory
-```wythoff-construct.py```  
-the .py extension is required for windows compatibility.
+# USAGE
+Once installed using pip the following command will launch the application from any working directory
+```wythoff-construct```  
 
 for general information regarding Wythoff Construction see https://en.wikipedia.org/wiki/Wythoff_construction
 
@@ -96,4 +60,14 @@ For a clear example, load [3²,4], the smaller inner cube when on Perspective pr
 ### Opacity
 Controls how opaque the faces (2D cells) are on the polytope. automatically scales down with dimension to compete with the
 growing number of faces.
+
+# EXAMPLES
+<p float="left">
+<img src="gifs/tesseract.gif" />
+<img src="gifs/4simplex.gif" />
+
+<img src="gifs/cube.gif" />
+<img src="gifs/icos.gif" />
+</p>
+
 
