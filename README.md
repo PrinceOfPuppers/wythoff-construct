@@ -17,7 +17,9 @@ pip install wythoff-construct
 
 # USAGE
 Once installed using pip the following command will launch the application from any working directory
-```wythoff-construct```  
+```
+wythoff-construct
+```  
 
 for general information regarding Wythoff Construction see https://en.wikipedia.org/wiki/Wythoff_construction
 
@@ -62,6 +64,7 @@ Controls how opaque the faces (2D cells) are on the polytope. automatically scal
 growing number of faces.
 
 # EXAMPLES
+> Looks much better in person!
 <p float="left">
 <img src="gifs/tesseract.gif" />
 <img src="gifs/4simplex.gif" />
