@@ -21,7 +21,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
         "Environment :: X11 Applications :: Qt",
     ],
-    python_requires='>=3.6',
+    python_requires='>=3.6, <3.9',
     scripts=["bin/wythoff-construct"],
     entry_points={
         'console_scripts': ['wythoff-construct = wythoff_construct:main'],

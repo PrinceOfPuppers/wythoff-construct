@@ -14,6 +14,8 @@
 ``` 
 pip install wythoff-construct
 ```
+Note wythoff-construct requires python version 3.6 to 3.8. version 3.9 will be supported as soon
+as vtk (a dependancy) supports 3.9.
 
 # USAGE
 Once installed using pip the following command will launch the application from any working directory

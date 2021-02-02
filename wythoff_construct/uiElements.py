@@ -56,7 +56,7 @@ class SliderList(HasTraits):
         return n
 
     def addSlider(self,val):
-        self.sliders.append(Range(val))
+        self.sliders.append(val)
         self[-1] = val
 
     def removeSlider(self):
