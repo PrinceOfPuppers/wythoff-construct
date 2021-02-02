@@ -69,7 +69,9 @@ growing number of faces.
 <p float="left">
 <img src="gifs/tesseract.gif" />
 <img src="gifs/4simplex.gif" />
+</p>
 
+<p float="left">
 <img src="gifs/cube.gif" />
 <img src="gifs/icos.gif" />
 </p>
