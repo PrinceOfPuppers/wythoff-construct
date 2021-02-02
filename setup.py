@@ -10,7 +10,7 @@ with open('README.md', 'r') as f:
 
 setuptools.setup(
     name="wythoff-construct",
-    version="0.2.0",
+    version="0.2.1",
     author="Joshua McPherson",
     author_email="joshuamcpherson5@gmail.com",
     description="Constructs and visualizes hyperdimensional polytopes created using Wythoff construction",

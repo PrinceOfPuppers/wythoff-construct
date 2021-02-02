@@ -1,4 +1,4 @@
-<img src="banner.jpg" />
+<img src="https://raw.githubusercontent.com/PrinceOfPuppers/wythoff-construct/master/banner.jpg" />
 
 # wythoff-construct
 
@@ -67,13 +67,13 @@ growing number of faces.
 # EXAMPLES
 > Looks much better in person!
 <p float="left">
-<img src="gifs/tesseract.gif" />
-<img src="gifs/4simplex.gif" />
+<img src="https://raw.githubusercontent.com/PrinceOfPuppers/wythoff-construct/master/gifs/tesseract.gif" />
+<img src="https://raw.githubusercontent.com/PrinceOfPuppers/wythoff-construct/master/gifs/4simplex.gif" />
 </p>
 
 <p float="left">
-<img src="gifs/cube.gif" />
-<img src="gifs/icos.gif" />
+<img src="https://raw.githubusercontent.com/PrinceOfPuppers/wythoff-construct/master/gifs/cube.gif" />
+<img src="https://raw.githubusercontent.com/PrinceOfPuppers/wythoff-construct/master/gifs/icos.gif" />
 </p>
 
 
