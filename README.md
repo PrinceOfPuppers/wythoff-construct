@@ -4,7 +4,6 @@
 
 > Constructs and visualizes hyperdimensional polytopes created using Wythoff construction
 - [INSTALLATION](#INSTALLATION)
-- [ABOUT](#ABOUT)
 - [USAGE](#USAGE)
 - [EXAMPLES](#EXAMPLES)
 
