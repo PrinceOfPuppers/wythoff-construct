@@ -1,1 +1,9 @@
-recursive-include project *.npy *.pkl
+recursive-include gifs *.gif
+
+include *.jpg 
+include LICENCE
+
+
+recursive-include wythoff_construct/savedKalidoscopes *.npy
+recursive-include wythoff_construct/savedKalidoscopes *.pkl
+

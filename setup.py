@@ -5,12 +5,17 @@ if platform == 'win32':
     print("Wythoff Construct Requires 64 Bit Python")
     exit()
 
+with open('README.md', 'r') as f:
+    longDescription = f.read()
+
 setuptools.setup(
     name="wythoff-construct",
-    version="0.1.0",
+    version="0.2.0",
     author="Joshua McPherson",
     author_email="joshuamcpherson5@gmail.com",
     description="Constructs and visualizes hyperdimensional polytopes created using Wythoff construction",
+    long_description = longDescription,
+    long_description_content_type = 'text/markdown',
     url="https://github.com/PrinceOfPuppers/wythoff-construct",
     packages=setuptools.find_packages(),
     include_package_data=True,
