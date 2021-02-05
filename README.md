@@ -1,6 +1,13 @@
 <img src="https://raw.githubusercontent.com/PrinceOfPuppers/wythoff-construct/master/banner.jpg" />
 
 # wythoff-construct
+<p>
+<img src="https://img.shields.io/pypi/dm/wythoff-construct">
+<img src="https://img.shields.io/pypi/l/wythoff-construct">
+<img src="https://img.shields.io/pypi/v/wythoff-construct">
+<img src="https://img.shields.io/pypi/pyversions/wythoff-construct">
+
+</p>
 
 > Constructs and visualizes hyperdimensional polytopes created using Wythoff construction
 - [INSTALLATION](#INSTALLATION)
