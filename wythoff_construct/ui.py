@@ -32,8 +32,7 @@ class Ui(HasTraits):
     kalidoscope = Instance(DropDown)
     scene = MlabSceneModel()
 
-    projTypeValues = ("perspective","orthographic")
-    projectionType = Enum(values = "projTypeValues")
+    projectionType = Enum("perspective","orthographic")
     rotationStr=String("")
     seedPointStr="Seed Point Selection:"
 

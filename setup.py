@@ -10,7 +10,7 @@ with open('README.md', 'r') as f:
 
 setuptools.setup(
     name="wythoff-construct",
-    version="0.2.2",
+    version="0.2.3",
     author="Joshua McPherson",
     author_email="joshuamcpherson5@gmail.com",
     description="Constructs and visualizes hyperdimensional polytopes created using Wythoff construction",
@@ -19,16 +19,17 @@ setuptools.setup(
     url="https://github.com/PrinceOfPuppers/wythoff-construct",
     packages=setuptools.find_packages(),
     include_package_data=True,
-    install_requires=['numpy','scipy','PyQt5',"mayavi"],
+    install_requires=['numpy', 'scipy', 'PyQt5', 'mayavi'],
     classifiers=[
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Environment :: X11 Applications :: Qt",
     ],
-    python_requires='>=3.6, <3.9',
+    python_requires='>=3.6, <3.10',
     scripts=["bin/wythoff-construct"],
     entry_points={
         'console_scripts': ['wythoff-construct = wythoff_construct:main'],
