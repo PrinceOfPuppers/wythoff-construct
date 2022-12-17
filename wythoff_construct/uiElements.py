@@ -11,15 +11,19 @@ class SliderList(HasTraits):
     low = 0.
     high = 1.
     
-    listedit= ListEditor(columns = 3)
-    sliders = List( 
-                    Range(low="low",high="high",editor = RangeEditor(low_label = "​", high_label = "​") ), 
-                    editor = listedit,
-                    comparison_mode=1, 
-                    cols= 3
-                    )
+    listedit = ListEditor(columns = 3)
+    sliders = \
+    List( 
+        Range(low="low",
+              high="high",
+              editor = RangeEditor(low_label = "​", high_label = "​"),
+          ),
+        editor = listedit,
+        comparison_mode=1,
+        cols= 3
+    )
 
-    def __init__(self,numEntries,val,numColumns = 1):
+    def __init__(self,numEntries, val, numColumns = 1):
         HasTraits.__init__(self)
         for _ in range(numEntries):
             self.listedit.columns = numColumns
@@ -55,7 +59,7 @@ class SliderList(HasTraits):
             n+=self[i]
         return n
 
-    def addSlider(self,val):
+    def addSlider(self, val):
         self.sliders.append(val)
         self[-1] = val
 

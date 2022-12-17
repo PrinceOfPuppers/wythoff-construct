@@ -37,7 +37,6 @@ class Ui(HasTraits):
     seedPointStr="Seed Point Selection:"
 
     view = View(Group(
-
                 Item('scene', editor=SceneEditor(scene_class=MayaviScene),springy=True,show_label=False),
                 Item('seedPointStr',show_label=False,style='readonly'),
                 Item('seedSliders',editor = InstanceEditor(),style='custom',springy=False,show_label=False),
@@ -91,8 +90,6 @@ class Ui(HasTraits):
 
         self.interactive = True
         
-
-
     def updatePolydata(self,newPolydata):
         self.polydata.points = newPolydata.points
         self.polydata.polys = newPolydata.polys
