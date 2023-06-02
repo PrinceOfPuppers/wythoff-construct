@@ -40,11 +40,11 @@ def generateRep(generators,prevRep,n):
     base = 1
 
     rep = prevRep
-    indices=[]
+    #indices=[]
     while base<=n:
         index = (n//base)%numGens
         
-        indices.append(index)
+        #indices.append(index)
         gen = generators[index]
         rep = np.matmul(gen,rep)
         
@@ -94,24 +94,24 @@ def findReflectionGroup(generators,groupOrder):
     
     # Now we generate the whole group by finding all other cosets
     cosetReps = [identity]
-    
+
     prevRep=identity.copy()
 
     i = 0
 
     while len(cosetReps)<numCosets:
         i+=1
-        if not areEqual(identity,np.eye(dim)):
-            raise Exception("identity mutated")
+        #if not areEqual(identity,np.eye(dim)):
+            #raise Exception("identity mutated")
 
-        rep = generateRep(generators,prevRep,i)
-        prevRep=rep.copy()
+        rep = generateRep(generators, prevRep, i)
+        prevRep = rep.copy()
 
         isNewRep = True
         for b in cosetReps:
             # checks if newRep*b^-1 is in the subgroup, if it is then the cosets represented by newRep and b are equal
 
-            a=np.matmul( np.linalg.inv(rep),b)
+            a = np.matmul( np.linalg.inv(rep), b)
             if isInList(a,subgroup):
                 isNewRep=False
                 break
@@ -168,23 +168,12 @@ def getSeedPoint(scalers,intersections):
     return point
 
 
-def orbitPoint(point,group):
-    """Finds the orbit of the point under reflection in all planes and returns orbit"""
-    points=np.empty((len(group),len(group[0])))
-
-    for i,reflection in enumerate(group):
-        np.matmul(reflection,point,points[i])
-
-    return points
-
-
-
-
 # Wrappers
 def getPointsAndFaces(point, group, projection, scalars = None):
     """wrapper for orbitPoints, find faces and project orbit onto 3 dimensions (useful due to order sensitivity)"""
     print("Orbiting Point...")
-    orbit = orbitPoint(point, group)
+    
+    orbit = group@point
     print("Getting Faces...")
     faces = findFaces(orbit)
     print("Got Faces")
@@ -195,14 +184,14 @@ def getPointsAndFaces(point, group, projection, scalars = None):
         for i,scalar in enumerate(scalars):
             np.matmul(rotationMatrix(dim,i,2*np.pi*scalar),rot,rot)
 
-        np.matmul(orbit,rot,orbit)
+        np.matmul(orbit, rot, orbit)
     
 
-    orbit = projection(orbit,len(orbit[0]))
+    orbit = projection(orbit, dim)
     return orbit,faces
 
 def getPoints(point,group, projection,scalars=None):
-    orbit=orbitPoint(point,group)
+    orbit = group@point
     dim = len(orbit[0])
     if scalars!= None:
         rot = np.eye(dim)
@@ -211,7 +200,7 @@ def getPoints(point,group, projection,scalars=None):
     
         np.matmul(orbit,rot,orbit)
 
-    orbit = projection(orbit,len(orbit[0]))
+    orbit = projection(orbit, dim)
 
     return orbit
 
@@ -290,3 +279,4 @@ class KalidoscopeGenerator:
             self.projection = orthographicProjection
         else:
             self.projection = perspectiveProjection
+
